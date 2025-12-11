@@ -109,4 +109,34 @@ Trust Policy (who can use the role)<br></br>
 •	EC2 can use this role<br></br>
 •	Nobody else can<br></br>
 
+# DAY 3 EC2(Elastic Cloud Compute):<br></br>
+
+# Q: What is an EC2 instance?<br></br>
+EC2 (Elastic Cloud Compute) as name suggest that we are requesting aws to give us a compute which is a combination of CPU, RAM and disk inshort we request aws to give us a virtual server. <br></br>
+Let suppose I am using a laptop and now I want kay my laptop is used by 2-3 more people so what I can do..i simply install hypervisor on my laptop and create a 2-3 virtual server/env now my laptop is used by 2-3 people other than me..Laptop is very small thing, servers are very expensive. So, usually people buy one server and multiple virtual servers are created on top of it and people use it with the help of hypervisor. Same goes for aws. Aws has a large datacenter across the world. When we ask aws to give me a ec2 means virtual server at specific region then what happened? My request is go to aws hypervisor and then aws assigned us an instance of ec2. (Not cnfrm)<br></br>
+We noticed that some of the aws services have a prefix Elastic. What this prefix mean? The services that can be scaled up or scaled down based on usage are usually named with a prefix Elastic i.e EKS, EBS, EC2.<br></br>
+
+# Q: Why we should use an EC2 instance?<br></br>
+To reduce the maintenance overhead. Let suppose as a devops engineer my task is to create a virtual machines for 100 developers so what I can do? First purchase a server then do the configuration and assigns VM to a developers but after this a dedicated team is needed for maintenance but with the help of Public Cloud. This type of things are done by cloud provider itself. AWS EC2 is a pay to go service means I can only for those time when I use the server. If at night I usually don’t use the server then there isn’t any need to pay.. simply close the EC2 instance and done. Also due to Elastic feature we can easily scaled up or scaled down the instance according to our need.<br></br>
+
+# Types of EC2 instances:<br></br>
+General Purpose EC2<br></br>
+Memory Optimized EC2<br></br>
+Storage Optimized EC2<br></br>
+Compute Optimized EC2<br></br>
+Accelerated EC2<br></br>
+
+Let suppose when you go to IBM and ask them to give you a server. They ask you what type of servers you want? Then based on your usage/your application you answer them..Like if you want big data analytics then go for memory optimized server or if you want fast computations for bitcoin etc then go for a  memory optimized EC2.<br></br>
+
+In interview usually interviewer asked kay what type of EC2 instances you prefer or you use? The answer is: based on my application complexity or usage it varies.<br></br>
+
+In the same way we ask aws to give us a general purpose ec2 instance for this demo. Steps to create all types of ec2 instances are exactly same only price varies. <br></br>
+
+
+# Availablility Zones and Regions:<br></br>
+Aws have services across the world so it is divided into multiple regions like Asia, Eurpoe, USA and in each region it have multiple Availablity zones. Incase of any issue at one availability zone the other availabilityzone is responsible to provide the services efficiently. And the selection of regions depends on multiple reasons like if you are in Europe and want less latency then you would select the region of your instance in Europe instead of Asia etc.<br></br>
+Let suppose you are working for a bank in Europe and the rule is to not put data outside of Europe for security purposes so in this case you should use the region in Europe not in Asia or any other.<br></br>
+
+# Inbound and Outbound Traffic Request:<br></br>
+Inbound traffic is the request that is coming inside aws to your EC2 instance and outbound is the request that goes outside. <br></br>
 
