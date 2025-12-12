@@ -1,4 +1,4 @@
-# Aws
+# Aws (Amazon Web Service)
 # DAY 01<br></br>
 # What is cloud?<br></br>
 Before 20 years, what happened? Organizations buy servers to deploy their applications on the servers. Similarly, like you buy a laptop, install a software in your laptop and then use it. 
