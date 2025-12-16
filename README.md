@@ -193,165 +193,166 @@ Imagine you’re building an office campus:<br></br>
 •	Security Groups = office locks, keycards for employees<br></br>
 With all this, you control who can go where, which buildings connect to the outside world, and how traffic flows safely.<br></br>
 
-EXTRA THINGS:
+# EXTRA THINGS:
 
-SSH stands for Secure Shell.
-It’s a secure way to connect to another computer over a network, usually to control a server remotely.
-In simple terms
-SSH lets you:
-•	Log in to another computer from far away
-•	Run commands as if you were sitting in front of it
-•	Do all of this safely (encrypted)
-Why SSH is important
-•	🔐 Encrypted: Passwords and data can’t be easily stolen
-•	🌍 Remote access: Manage servers from anywhere
-•	⚙️ Admin tasks: Install software, edit files, restart services
-Common uses
-•	Connecting to a Linux server
-•	Managing cloud servers (AWS, Azure, etc.)
-•	Secure file transfer (using scp or sftp)
-•	Git connections (e.g., GitHub via SSH keys)
+# SSH
+SSH stands for Secure Shell.<br></br>
+It’s a secure way to connect to another computer over a network, usually to control a server remotely.<br></br>
+In simple terms<br></br>
+SSH lets you:<br></br>
+•	Log in to another computer from far away<br></br>
+•	Run commands as if you were sitting in front of it<br></br>
+•	Do all of this safely (encrypted)<br></br>
+Why SSH is important<br></br>
+•	🔐 Encrypted: Passwords and data can’t be easily stolen<br></br>
+•	🌍 Remote access: Manage servers from anywhere<br></br>
+•	⚙️ Admin tasks: Install software, edit files, restart services<br></br>
+# Common uses<br></br>
+•	Connecting to a Linux server<br></br>
+•	Managing cloud servers (AWS, Azure, etc.)<br></br>
+•	Secure file transfer (using scp or sftp)<br></br>
+•	Git connections (e.g., GitHub via SSH keys)<br></br>
 
-Basic example
-ssh username@server_ip
-Example:
-ssh alice@192.168.1.10
-SSH keys (very common)
-Instead of passwords, SSH often uses key pairs:
-•	🔑 Private key → stays on your computer
-•	🔓 Public key → stored on the server
-This is more secure than passwords.
+# Basic example<br></br>
+ssh username@server_ip<br></br>
+# Example:<br></br>
+ssh alice@192.168.1.10<br></br>
+SSH keys (very common)<br></br>
+Instead of passwords, SSH often uses key pairs:<br></br>
+•	🔑 Private key → stays on your computer<br></br>
+•	🔓 Public key → stored on the server<br></br>
+This is more secure than passwords.<br></br>
 
-SUBNET AND SUBNET MASK: (More understanding needed on this topic, watch video from youtube)
+# SUBNET AND SUBNET MASK: (More understanding needed on this topic, watch video from youtube)<br></br>
 
-🌐 First: What is an IP address? (VERY important)
-Every device on a network has an IP address.
-Think of it like a home address.
-Example IP:
-192.168.1.10
-This number tells:
-•	Which network the device is in
-•	Which device it is inside that network
-________________________________________
-🏘️ What is a Network?
-A network is a group of devices that can talk to each other.
-Example:
-•	All devices connected to your Wi-Fi router
-•	All computers inside an office
-________________________________________
-🧩 Now… What is a Subnet?
-Simple definition:
-A subnet is a smaller network inside a bigger network.
-________________________________________
-🏙️ Real-life example (BEST way to understand)
-Imagine:
-•	A city = Big network
-•	Areas / blocks inside the city = Subnets
-•	Houses = Devices
-Instead of one giant messy city, we divide it into organized areas.
-________________________________________
-Why do we create subnets?
-1.	🚀 Faster communication
-2.	🔐 Better security
-3.	🧠 Easier management
-4.	📉 Less network traffic
-So:
-Subnet = splitting one big network into smaller parts
-________________________________________
-🎭 What is a Subnet Mask?
-Now comes the key part.
-Simple definition:
-A subnet mask tells:
-“Which part of the IP address is the network, and which part is the device”
-________________________________________
-📦 IP Address has TWO parts
-Example:
-192.168.1.10
-•	192.168.1 → Network part
-•	10 → Device (host) part
-But how does the computer know this?
-👉 Using the subnet mask
-________________________________________
-🎭 Subnet Mask Example
-Common subnet mask:
-255.255.255.0
-Put them together:
-IP Address	192.168.1.10
-Subnet Mask	255.255.255.0
-This mask says:
-•	First 3 numbers = network
-•	Last number = device
-________________________________________
-🧠 Easy trick to remember
-•	255 = network part
-•	0 = device part
-So:
-255.255.255.0
-means:
-Network.Network.Network.Device
-________________________________________
-🏠 What devices belong to the same subnet?
-With:
-Network: 192.168.1.0
-Mask:    255.255.255.0
-Devices in SAME subnet:
-•	192.168.1.1
-•	192.168.1.5
-•	192.168.1.200
-Devices in DIFFERENT subnet:
-•	192.168.2.10 ❌
-•	10.0.0.5 ❌
-________________________________________
-🚦 Why subnet mask is CRUCIAL
-Before sending data, your computer asks:
-“Is this device in my subnet?”
-•	✅ YES → send directly
-•	❌ NO → send to router
-Subnet mask helps answer this question.
-________________________________________
-🧮 CIDR notation (small but important)
-Sometimes you’ll see:
-192.168.1.0/24
-This means:
-•	/24 → first 24 bits are network
-•	Same as:
-255.255.255.0
-Common ones:
-CIDR	Subnet Mask
-/8	255.0.0.0
-/16	255.255.0.0
-/24	255.255.255.0
-________________________________________
-🔪 Subnetting (splitting networks)
-Example:
-•	One network: 192.168.1.0/24
-•	254 devices possible
-Split into 2 subnets:
-•	192.168.1.0/25
-•	192.168.1.128/25
-Each subnet:
-•	126 devices
-This is subnetting.
-________________________________________
-🛑 Special addresses in a subnet
-For 192.168.1.0/24:
-Address	Meaning
-192.168.1.0	Network address
-192.168.1.1	First device
-192.168.1.254	Last device
-192.168.1.255	Broadcast
-You cannot assign:
-•	Network address
-•	Broadcast address
-________________________________________
-🧠 One-line summary
-•	Subnet = small network inside a big one
-•	Subnet mask = tells which part is network & which part is device
-•	Purpose = speed, security, organization
-________________________________________
-🔚 Final analogy (easy to remember)
-📍 IP address → House number
-🏘️ Subnet → Area / block
-🎭 Subnet mask → Map showing area boundaries
-🚦 Router → Post office between areas
+# 🌐 First: What is an IP address? (VERY important)<br></br>
+Every device on a network has an IP address.<br></br>
+Think of it like a home address.<br></br>
+Example IP:<br></br>
+192.168.1.10<br></br>
+This number tells:<br></br>
+•	Which network the device is in<br></br>
+•	Which device it is inside that network<br></br>
+________________________________________<br></br>
+# 🏘️ What is a Network?<br></br>
+A network is a group of devices that can talk to each other.<br></br>
+Example:<br></br>
+•	All devices connected to your Wi-Fi router<br></br>
+•	All computers inside an office<br></br>
+________________________________________<br></br>
+# 🧩 Now… What is a Subnet?<br></br>
+Simple definition:<br></br>
+A subnet is a smaller network inside a bigger network.<br></br>
+________________________________________<br></br>
+# 🏙️ Real-life example (BEST way to understand)<br></br>
+Imagine:<br></br>
+•	A city = Big network<br></br>
+•	Areas / blocks inside the city = Subnets<br></br>
+•	Houses = Devices<br></br>
+Instead of one giant messy city, we divide it into organized areas.<br></br>
+________________________________________<br></br>
+# Why do we create subnets?<br></br>
+1.	🚀 Faster communication<br></br>
+2.	🔐 Better security<br></br>
+3.	🧠 Easier management<br></br>
+4.	📉 Less network traffic<br></br>
+So:<br></br>
+Subnet = splitting one big network into smaller parts<br></br>
+________________________________________<br></br>
+# 🎭 What is a Subnet Mask?<br></br>
+Now comes the key part.<br></br>
+Simple definition:<br></br>
+A subnet mask tells:<br></br>
+“Which part of the IP address is the network, and which part is the device”<br></br>
+________________________________________<br></br>
+# 📦 IP Address has TWO parts<br></br>
+Example:<br></br>
+192.168.1.10<br></br>
+•	192.168.1 → Network part<br></br>
+•	10 → Device (host) part<br></br>
+But how does the computer know this?<br></br>
+👉 Using the subnet mask<br></br>
+________________________________________<br></br>
+# 🎭 Subnet Mask Example<br></br>
+Common subnet mask:<br></br>
+255.255.255.0<br></br>
+Put them together:<br></br>
+IP Address	192.168.1.10<br></br>
+Subnet Mask	255.255.255.0<br></br>
+This mask says:<br></br>
+•	First 3 numbers = network<br></br>
+•	Last number = device<br></br>
+________________________________________<br></br>
+# 🧠 Easy trick to remember<br></br>
+•	255 = network part<br></br>
+•	0 = device part<br></br>
+So:<br></br>
+255.255.255.0<br></br>
+means:<br></br>
+Network.Network.Network.Device<br></br>
+________________________________________<br></br>
+# 🏠 What devices belong to the same subnet?<br></br>
+With:<br></br>
+Network: 192.168.1.0<br></br>
+Mask:    255.255.255.0<br></br>
+Devices in SAME subnet:<br></br>
+•	192.168.1.1<br></br>
+•	192.168.1.5<br></br>
+•	192.168.1.200<br></br>
+Devices in DIFFERENT subnet:<br></br>
+•	192.168.2.10 ❌<br></br>
+•	10.0.0.5 ❌<br></br>
+________________________________________<br></br>
+#🚦 Why subnet mask is CRUCIAL<br></br>
+Before sending data, your computer asks:<br></br>
+“Is this device in my subnet?”<br></br>
+•	✅ YES → send directly<br></br>
+•	❌ NO → send to router<br></br>
+Subnet mask helps answer this question.<br></br>
+________________________________________<br></br>
+# 🧮 CIDR notation (small but important)<br></br>
+Sometimes you’ll see:<br></br>
+192.168.1.0/24<br></br>
+This means:<br></br>
+•	/24 → first 24 bits are network<br></br>
+•	Same as:<br></br>
+255.255.255.0<br></br>
+Common ones:<br></br>
+CIDR	Subnet Mask<br></br>
+/8	255.0.0.0<br></br>
+/16	255.255.0.0<br></br>
+/24	255.255.255.0<br></br>
+________________________________________<br></br>
+# 🔪 Subnetting (splitting networks)<br></br>
+Example:<br></br>
+•	One network: 192.168.1.0/24<br></br>
+•	254 devices possible<br></br>
+Split into 2 subnets:<br></br>
+•	192.168.1.0/25<br></br>
+•	192.168.1.128/25<br></br>
+Each subnet:<br></br>
+•	126 devices<br></br>
+This is subnetting.<br></br>
+________________________________________<br></br>
+# 🛑 Special addresses in a subnet<br></br>
+For 192.168.1.0/24:<br></br>
+Address	Meaning<br></br>
+192.168.1.0	Network address<br></br>
+192.168.1.1	First device<br></br>
+192.168.1.254	Last device<br></br>
+192.168.1.255	Broadcast<br></br>
+You cannot assign:<br></br>
+•	Network address<br></br>
+•	Broadcast address<br></br>
+________________________________________<br></br>
+# 🧠 One-line summary<br></br>
+•	Subnet = small network inside a big one<br></br>
+•	Subnet mask = tells which part is network & which part is device<br></br>
+•	Purpose = speed, security, organization<br></br>
+________________________________________<br></br>
+# 🔚 Final analogy (easy to remember)<br></br>
+📍 IP address → House number<br></br>
+🏘️ Subnet → Area / block<br></br>
+🎭 Subnet mask → Map showing area boundaries<br></br>
+🚦 Router → Post office between areas<br></br>
 
