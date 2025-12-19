@@ -356,9 +356,11 @@ ________________________________________<br></br>
 🎭 Subnet mask → Map showing area boundaries<br></br>
 🚦 Router → Post office between areas<br></br>
 # DAY 5 (Security Groups and NACL):
+# Something about loadbalancer (Side Topic/Side Thing): <br></br>
+Loadbalancer is usually placed by devops engineers in public subnet. It can be directly access to the outside world and this load balancer can also forwards the request to the private subnet or it can have access to the private subnet.<br></br>
+<br></br>
 VPC introduces the concept of Virtual Private Cloud in the world of Public Cloud. After the VPC mechanism like internet gateway (Main checkpost before entering in RWP) say pass hogya loadbalancer nay request agey forward kr di phir let suppose E block may gya aur udher E block may aik aur guard ha (society main gate guard) jis say pass kr kay logo kay ghr may jye ga (guard outside home). Once the load balancer forwards the request to the private subnet If we add more security at a subnet level. What we will do? We will start using NACLs (main building gate guard) and even if we bypass this we can add security at EC2 level (the location where our application is actually deployed) so at the EC2 level if we add more security we call it security group.<br></br>
 In aws, there are multiple layers where we add security because security is a very important component. Any organization that moves to public cloud it first see’s the security of that public cloud regardless of cost and anything else because all important info of the organization is present on the public cloud.<br></br>
 
-# Something about loadbalancer (Side Topic/Side Thing): <br></br>
-Loadbalancer is usually placed by devops engineers in public subnet. It can be directly access to the outside world and this load balancer can also forwards the request to the private subnet or it can have access to the private subnet.<br></br>
+
 
