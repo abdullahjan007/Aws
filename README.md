@@ -617,7 +617,7 @@ Using NACLs as primary security can cause issues:<br></br>
 •	More rules to maintain<br></br>
 •	Harder to debug than SGs<br></br>
 Best practice used by senior DevOps teams:<br></br>
-•	NACL: minimal, restrictive, stable<br></br>
+•	NACL: minimal, restrictive, stable<br></br> wohi scene ha jb concert pay kisi uni ja rhy ho guard bs student card dekh kay allow kr de ga simple and stable (NACL bhi isi tarha ha stable and simple) but jb ap enter ho jye gay aur concert ground may enter honey say pehle ap ki detail checking hogi (Security group bhi isi tarha ha detailed and app-specific) 
 •	SG: detailed, flexible, app-specific<br></br>
 ________________________________________<br></br>
 # Interview-grade explanation (very strong answer)<br></br>
