@@ -386,9 +386,9 @@ Traffic must be allowed by BOTH.<br></br>
 If NACL blocks, traffic is blocked even if SG allows. Means ager society ka guard hi ander nhi aney de rha tou E block tk ponch hi nhi sako gay<br></br>
 
 In NACL you can set both inbound and outbound rules but in SG you allow only inbound rules, outbound rules are automatically allowed. <br></br>
-NACL is also used for automation like if I set NACL for some private subnet (E block in a society tou ab E block may jitney bhi ghr ho gay saab pay ye rule apply ho ga) and in that subnet let suppose there are 1000 instances so same rule is applied to all 1000 instances you only have to set at NACL level.<br></br>
+NACL is also used for automation like if I set NACL for some private subnet (E block in a society tou ab E block may jitney bhi ghr ho gay saab pay ye rule apply ho ga) and in that subnet let suppose there are 1000 instances so same rule is applied to all 1000 instances you only have to set at NACL level.Scene aisa ha kay let suppose ap nay 1000 instances ya app pay koi rule define karna ha so instead of set all this on 1000 apps/instances bari bari what you can do you? put them in a private subnet and set a rule at NACL level is say hoga ye kay aik dafa rule set karney say all 1000 instances/apps pay same rule apply ho jye ga (not cnfrm) <br></br>
 If we want to deny or block the traffic like what type of traffic we want to allow or what type of traffic we want to deny in that scenario we set the rule at NACL level.<br></br>
-But Securit group is only used for allowing traffic. Security group doesnot deny any trafiic<br></br>
+But Security group is only used for allowing traffic. Security group doesnot deny any trafiic<br></br>
 
 
 # GPT Overview:<br></br>
