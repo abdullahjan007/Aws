@@ -156,6 +156,7 @@ Let suppose I want to attach the same security group (guards infront of houses) 
 
 # NAT Gateways:<br></br>
 Let suppose your EC2 inside VPC wants to download something from internet but due to security reasons you don’t want to expose the VPC EC2 IP to outside world but downloading is necessary so what we can do? We use the NAT gateway… NAT adds a mask to the IP (or we can say it changes the IP) and access the thing outside the VPC. NAT will try to mask the IP address It will change the IP address with the public IP address either of the load balance or either of the router. If it is using loadbalancer we say SNAT and if it is using route table we say it NAT gateway. <br></br>
+For private subnet we use NAT for internet access of our app/instance<br></br>
 
 
 # GPT PERSPECTIVE:<br></br>
