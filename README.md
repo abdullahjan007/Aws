@@ -650,5 +650,9 @@ We will create a project.. In this project we have a VPC and in that VPC we have
 # Bastion Host and Jump Server:
 Our server/ec2 is in a private subnet so they don’t have a public IP and we cannot ssh into these instances directly and can’t create public ip address for it so what we can do?.. we can create a bastion host or jump host in public subnet and through that we can connect to our ec2 instance in private subnet. Flow is -> we first connect to bastion host and then from bastion host we connect to our ec2. With bastion we have a proper logging mechanism etc. <br></br>
 
+# Q: What is Elastic IP address? <br></br>
+Elastic ip address in aws is nothing but an ip address that will remain the same even if instance is deleted or terminated, we can also say it as a static ip address. Let’s take an example, if we assign an elastic ip to an ec2 instance then if the ec2 instance goes down and come back the ip still remains the same. <br></br>
+
+
 
 
