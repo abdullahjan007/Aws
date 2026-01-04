@@ -656,5 +656,10 @@ Elastic ip address in aws is nothing but an ip address that will remain the same
 # AutoScaling Group:<br></br>
 Autoscaling group in aws can’t be created directly we can use the launch template. So why you need the launch template? Because we can use this launch template across multiple autoscaling groups or this template acts as a reference like tomorrow if I want to understand kay how my autoscaling group behaving.. is my autoscaling group scaling one instance, 10 instance, 100 instance so we can use this launch template as a reference.easy wording may samjho like mainey 3 templates bna liye aur template1 10 instances launch/scale karta ha, isi tarha template2 100 instances so on so forth tou ab ager mujhe 100 instance scaling chahiye tou ma us kay sath template2 link kr du ga (not cnfrm) <br></br>
 
+# IMP:
+ab humney apney local pc say bastion host ko connect karna ha aur phir humney bastian say private subnet ko connect karna ha..<br></br>
+local say bastian tk connect karney kay liye key-value pair jo laptop download kia ha use kr lein ge with the help of this command ssh -i login_aws.pem ubuntu@<bastianhost-serverip> aur hum bastian host may chaley gye but bastian say private subnet ko connect karney kay liye bhi tou humey key-value pair chahiye na wo key value pair hum bastian host pay kaisey le kr jyein gay? Us kay liye hum scp (Secure copy command use karein ge us say hoga ye kay local pay jo key-value pair download the wo bastian host pay bhi copy ho jye ga)<br></br>
+Command: scp -I User/Downloads/Abdullah login-aws.pem User/Downloads/Abdullah login-aws.pem ubunutu@<bastian-Server-pi>:home/ubuntu<br></br>
+is command say hoga ye kay hum bastian host pay connect kr kay jb ls karein gay tou udher bhi ye pari hogi.<br></br>
 
 
