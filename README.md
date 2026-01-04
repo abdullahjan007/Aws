@@ -653,6 +653,8 @@ Our server/ec2 is in a private subnet so they don’t have a public IP and we ca
 # Q: What is Elastic IP address? <br></br>
 Elastic ip address in aws is nothing but an ip address that will remain the same even if instance is deleted or terminated, we can also say it as a static ip address. Let’s take an example, if we assign an elastic ip to an ec2 instance then if the ec2 instance goes down and come back the ip still remains the same. <br></br>
 
+# AutoScaling Group:<br></br>
+Autoscaling group in aws can’t be created directly we can use the launch template. So why you need the launch template? Because we can use this launch template across multiple autoscaling groups or this template acts as a reference like tomorrow if I want to understand kay how my autoscaling group behaving.. is my autoscaling group scaling one instance, 10 instance, 100 instance so we can use this launch template as a reference.easy wording may samjho like mainey 3 templates bna liye aur template1 10 instances launch/scale karta ha, isi tarha template2 100 instances so on so forth tou ab ager mujhe 100 instance scaling chahiye tou ma us kay sath template2 link kr du ga (not cnfrm) <br></br>
 
 
 
