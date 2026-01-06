@@ -662,4 +662,7 @@ local say bastian tk connect karney kay liye key-value pair jo laptop download k
 Command: scp -I User/Downloads/Abdullah login-aws.pem User/Downloads/Abdullah login-aws.pem ubunutu@<bastian-Server-pi>:home/ubuntu<br></br>
 is command say hoga ye kay hum bastian host pay connect kr kay jb ls karein gay tou udher bhi ye pari hogi.<br></br>
 
+# THE FOLLOWING LINE I COPIED FROM SOMEONE'S COMMENT ON DAY-07 VIDEO OF PLAYLIST AWS ZERO TO HERO
+We can login to private hosts from bastion host with out copying pem file to bastion host. If you copy pem file to bastion host it is security breach as if attacker  can access to bastion host since it has public ip and with pem file in bastion he can access to private hosts as well<br></br>
+
 
