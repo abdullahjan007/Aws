@@ -724,4 +724,34 @@ Using only NACLs would be considered:<br></br>
 •	❌ Not best practice<br></br>
 •	❌ Not how AWS expects you to design VPC networking<br></br>
 
+# 1️⃣ Stateful<br></br>
+# Definition:<br></br>
+A firewall or rule is stateful if it remembers the state of a connection.<br></br>
+•	This means if an incoming request is allowed, the return traffic is automatically allowed — no need for explicit rules.<br></br>
+# 🔹 AWS Example: Security Groups<br></br>
+•	Security Groups are stateful.<br></br>
+•	If you allow outbound traffic to the internet:<br></br>
+o	The return inbound traffic is automatically allowed.<br></br>
+•	If you allow inbound traffic from a subnet:<br></br>
+o	The reply outbound traffic is automatically allowed.<br></br>
+# Example:<br></br>
+•	You allow outbound TCP port 80 (HTTP) from your instance to 0.0.0.0/0.<br></br>
+•	When the web server responds back, you don’t need an inbound rule — the Security Group automatically allows the return traffic.<br></br>
+✅ Key point: Stateful “remembers” the session.<br></br>
+________________________________________<br></br>
+# 2️⃣ Stateless<br></br>
+# Definition:<br></br>
+A firewall or rule is stateless if it does NOT remember the connection.<br></br>
+•	You must explicitly allow both inbound and outbound traffic.<br></br>
+🔹 AWS Example: Network ACLs<br></br>
+•	Network ACLs are stateless.<br></br>
+•	If you allow outbound traffic on port 80:<br></br>
+o	You must also allow inbound return traffic (typically ephemeral ports 1024-65535) explicitly.<br></br>
+•	Each packet is evaluated independently — no memory of previous packets.<br></br>
+# Example:<br></br>
+•	Outbound HTTP traffic allowed to 0.0.0.0/0 (port 80).<br></br>
+•	Return traffic from the web server will be blocked unless there is an inbound rule allowing it.<br></br>
+❌ Key point: Stateless “forgets” everything — you have to define rules both ways.<br></br>
+
+
 
