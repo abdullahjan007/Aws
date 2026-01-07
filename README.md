@@ -679,7 +679,7 @@ I would distribute the subnets across multiple AZ for high availability. Additio
 Let's assume in VPC i have 1 AZ and in that AZ i have two subnets and in each subnet there are instances and for each subnet i have separate SG and NACL and in SG we don't have to set the outbound traffic (because SG’s are stateful) rule bydefault but in NACL we are supposed to set the outbound traffic rule (because NACL are stateless). So i allow the all traffic rule in a subnet that need the allow outbound internet access and deny the traffice for the subnet that don't allow outbound internet access.<br></br>
 
 # Abishek answer:
-To restrict outbound internet access for resources in one subnet, we can modify the route table associated with that subnet. In the route table, we can remove the default route (0.0.0.0/0) that points to an internet gateway. This would prevent resources in that subnet from accessing the internet. For the subnet where outbound internet access is required, we can keep the default route pointing to the internet gateway.<br></br>
+There are multiple approaches like we can set rule at SG or at NACL level but most accurate approach is: To restrict outbound internet access for resources in one subnet, we can modify the route table associated with that subnet. In the route table, we can remove the default route (0.0.0.0/0) that points to an internet gateway. This would prevent resources in that subnet from accessing the internet. For the subnet where outbound internet access is required, we can keep the default route pointing to the internet gateway.<br></br>
 
 
 # GPT perspective on my answer:
