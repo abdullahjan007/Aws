@@ -662,7 +662,66 @@ local say bastian tk connect karney kay liye key-value pair jo laptop download k
 Command: scp -I User/Downloads/Abdullah login-aws.pem User/Downloads/Abdullah login-aws.pem ubunutu@<bastian-Server-pi>:home/ubuntu<br></br>
 is command say hoga ye kay hum bastian host pay connect kr kay jb ls karein gay tou udher bhi ye pari hogi.<br></br>
 
-# THE FOLLOWING LINE I COPIED FROM SOMEONE'S COMMENT ON DAY-07 VIDEO OF PLAYLIST AWS ZERO TO HERO
+# THE FOLLOWING LINE I COPIED FROM SOMEONE'S COMMENT ON DAY-07 VIDEO OF PLAYLIST AWS ZERO TO HERO <br></br>
 We can login to private hosts from bastion host with out copying pem file to bastion host. If you copy pem file to bastion host it is security breach as if attacker  can access to bastion host since it has public ip and with pem file in bastion he can access to private hosts as well<br></br>
+
+# DAY 8 (Interview Questions): <br></br>
+# Q1: You have been assigned to design a VPC architecture of a 2-tier application. The application needs to be highy available and scalable. How would you design the VPC architecture? <br></br>
+
+# My answer: <br></br>
+For high scalibilty I use Auto Scaling group because  it automatically scales up and down the instances according to the need, and for high availability I use multi region availability zones because if my app goes down in one zone its still accessible from other zone. I also use load balancer so that it sends requests to multiple instances not only on one instance for durability.<br></br>
+#  Abhishek Answer: <br></br>
+In this scenario, I would design a VPC architecture in the following way.<br></br>
+I would create 2 subnets; public and private. The public subnet would contain the load balancers and be accessible from the internet. The private subnet would hold the application servers.<br></br>
+I would distribute the subnets across multiple AZ for high availability. Additionally, I would configure autoscaling group for the application servers.<br></br>
+# Q2: Your organization has a VPC with multiple subnets. You want to restrict outbound internet access for resource in on subnet, but allow outbound internet access for resource in another subnet. How would you achieve this?<br></br>
+# My answer:<br></br>
+Let's assume in VPC i have 1 AZ and in that AZ i have two subnets and in each subnet there are instances and for each subnet i have separate SG and NACL and in SG we don't have to set the outbound traffic (because SG’s are stateful) rule bydefault but in NACL we are supposed to set the outbound traffic rule (because NACL are stateless). So i allow the all traffic rule in a subnet that need the allow outbound internet access and deny the traffice for the subnet that don't allow outbound internet access.<br></br>
+
+# GPT perspective on my answer:
+Short answer: your answer is partially correct, but it is not sufficient or recommended by itself.<br></br>
+Why your NACL-based answer is not fully correct<br></br>
+You suggested:<br></br>
+•	Using separate subnets<br></br>
+•	Allowing outbound traffic in NACL for one subnet<br></br>
+•	Denying outbound traffic in NACL for the other subnet<br></br>
+✅ What you got right<br></br>
+•	NACLs are subnet-level → correct<br></br>
+•	NACLs can allow/deny outbound traffic → correct<br></br>
+•	Denying outbound rules will block traffic → correct<br></br>
+So technically:<br></br>
+Yes, denying outbound traffic in a NACL will stop internet access.<br></br>
+________________________________________<br></br>
+❌ Why this is not the correct architectural answer<br></br>
+1️⃣ Internet access is determined by routing, not just firewalls<br></br>
+For a resource to reach the internet, it needs:<br></br>
+1.	A route to the internet (IGW or NAT)<br></br>
+2.	Firewall rules that allow the traffic<br></br>
+If a subnet has no route to the internet, traffic cannot leave, even if:<br></br>
+•	Security Groups allow it<br></br>
+•	NACLs allow it<br></br>
+➡️ Route tables are the primary control mechanism<br></br>
+________________________________________<br></br>
+2️⃣ NACLs are stateless and coarse-grained<br></br>
+Problems with using NACLs for this purpose:<br></br>
+•	Stateless → return traffic must be explicitly allowed<br></br>
+•	Hard to manage at scale<br></br>
+•	Not designed to control connectivity architecture<br></br>
+•	One mistake can break internal traffic as well<br></br>
+AWS best practice:<br></br>
+Use route tables to control reachability<br></br>
+Use NACLs for additional security boundaries<br></br>
+________________________________________<br></br>
+3️⃣ Exam / interview expectation<br></br>
+If this is:<br></br>
+•	AWS exam<br></br>
+•	Interview question<br></br>
+•	Architecture design<br></br>
+Then the expected answer is:<br></br>
+Use separate route tables per subnet to control outbound internet access.<br></br>
+Using only NACLs would be considered:<br></br>
+•	❌ Incomplete<br></br>
+•	❌ Not best practice<br></br>
+•	❌ Not how AWS expects you to design VPC networking<br></br>
 
 
