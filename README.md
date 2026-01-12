@@ -835,4 +835,4 @@ Anything that you upload on S3 you can basically access that object using HTTP p
 Bucket in aws is very simple concept. We understand this with the following easy example;<br></br>
 When we create ec2 in aws we basically get the virtual machine or compute instance. Similarly, if we go to the s3 service what we get from the s3 service? We get the s3 bucket and inside that bucket we can store the information that’s why we call it bucket and this bucket don’t have any restrictions like how much data you can store? What kind of data you can store? Technically you can store Tbs of data like 100 tBs with very less cost.<br></br>
 
-
+As s3 bucket is globally accessible so you have to make a bucket with a unique name. The name not be unique wrt to your aws account. it should be unique across the world because s3 is a globally accessible service.. 
