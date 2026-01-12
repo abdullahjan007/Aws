@@ -813,3 +813,14 @@ Create a new EC2 instance in a public subnet, which will serve as the bastion ho
 Configure the security group for the bastion host to allow inbound SSH (or RDP for Windows) traffic from your IP address or a restricted range of trusted IP addresses. This limits access to the bastion host to authorized administrators only.<br></br>
 Place the instances in the private subnet and configure their security groups to allow inbound SSH (or RDP) traffic from the bastion host security group.<br></br>
 SSH (or RDP) into the bastion host using your private key or password. From the bastion host, you can then SSH (or RDP) into the instances in the private subnet using their private IP addresses.<br></br>
+
+# DAY 9 S3 (Simple Storage Service):<br></br>
+It is the very easy and simple service to learn in aws. It solves the very basic problem of storage that everyone co-relates. Let suppose we are using a phone or laptop and we ran out of storage then what we can do? We buy a harddisk pendrive of some 500GB or 1TB etc but organizations have a very large data, databases, data dumps, application logs, excel files, csv file and many other which can’t be store in some TB harddisk etc so they need some storage solution and as we discussed previously organizations are moving towards public cloud and how aws solved this issue.. Answer is aws s3 service.<br></br>
+The major success behind this like why s3 become so popular lie’s in the single number (11 9’s) 99.99999999999<br></br>
+
+Q: What is S3 and what are its characteristics?<br></br>
+A: S3 is a simple storage service which has the following characteristics:<br></br>
+Highly available, scalable, cost effective, secure and performance.<br></br>
+It is a cloud storage service provided by aws.<br></br>
+S3 allows you to store and retrieve any amount of data anywhere from the web.<br></br>
+
