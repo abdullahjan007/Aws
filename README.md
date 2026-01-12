@@ -824,3 +824,11 @@ Highly available, scalable, cost effective, secure and performance.<br></br>
 It is a cloud storage service provided by aws.<br></br>
 S3 allows you to store and retrieve any amount of data anywhere from the web.<br></br>
 
+What you can store in these s3? Like You may say kay my laptop storage is full because i download many movies in it and my phone storage is full because I saved a lot of photos in it but what kind of files, data an organization have? And what kind of things are store in s3?<br></br>
+
+In general, s3 doesn’t have any restriction you can store videos, photos, files, reports, excel sheets etc but as devops engineer you sometimes need to store application logs for some 30 days or sometimes organization needs to store some huge databases. Let’s take an example of flipkart.com. Fipkart have a huge database that contains user information like the information of users who uses flipkart for last 30 days and organization do backup of these databases/information as well...even if we took on single dump of this information or even do a backup of this information/databases it took almost 6-7TB. So it’s a big problem then amazon comes into a picture and said no problem as you move to a public cloud then this problem is solved by myself (my service of s3 is able to do so). S3 is the second service that aws introduced which clearly shows how much important this storage issue was at that time.<br></br>
+
+Anything that you upload on S3 you can basically access that object using HTTP protocol. So let’s say you created a bucket and name of the bucket is demo-aj-january08 then we can access the content inside the bucket using the HTTP protocol and also add the api of the bucket before the bucket name. S3 is a globally accessible service means you can put your logs files and databases anywhere in the world and you can access it from anywhere in the world. Let say if you put a movie in s3 bucket and share its url then anyone in the world can access it.<br></br>
+
+
+
