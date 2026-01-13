@@ -916,9 +916,23 @@ Let suppose you add some data in s3 bucket. Now if that data gets deleted from y
 Now take a scenario kay let suppose your availability zone gets down in which you have your s3 and we already said that s3 is highly available and we have store data dumps and confidential data in it so what happens if s3 gets down. It’s a concerning issue if organization confidential data gets down. The answer lies in the number 99.99999999999. AWS claims that if you add 1 billion objects in s3 over a period of 100 years then there’s a chance kay only 1 object gets deleted this is how much s3 service is reliable. The reason behind this relability is kay in one region there are multiple availability zones and in each availability zones there are multiple data centers so aws replicates this bucket kay if one az gets down, its still available from other az as well.  <br></br>
 # Advantages of s3:<br></br>
 The following is the advantages of s3:<br></br>
-Scalability and Durability (S3 is 99.99999999999) percent reliable and durable<br></br>
+Scalability and Durability<br></br>
 Availability<br></br>
 Security<br></br>
 Cost Effective <br></br>
-Performance (If you create s3 in a region nearby you then you can quickly access the content, download it and use it and quickly upload it and one more thing regarding performance is kay if you want to upload some file and that file is around 400TB or while upload you face some power cut issue or internet issue and upload takes some days  then what happens? AWS comes with a concept called multi-part upload in this you divide the file to upload in chunks like you divide into multiple 100MB chunks.<br></br>
+Performance<br></br> 
+# Performance: <br></br> 
+If you create s3 in a region nearby you then you can quickly access the content, download it and use it and quickly upload it and one more thing regarding performance is kay if you want to upload some file and that file is around 400TB or while upload you face some power cut issue or internet issue and upload takes some days  then what happens? AWS comes with a concept called multi-part upload  in this you divide the file to upload in chunks like you divide into multiple 100MB chunks.<br></br> 
+Even in multi-part upload if there’s some mishap in uploading aws will retry that process and it will continue your upload thing.<br></br> 
+# Durability:<br></br> 
+(S3 is 99.99999999999) percent reliable and durable<br></br> 
+# Scalability:<br></br> 
+You can store alomost unlimited data in a single bucket. However, one object should not be more than 5Tb which is a very huge amount. If you want to upload file more than 5tb then you have to break your file.<br></br> 
+# Tip:<br></br> 
+Choose multi-part upload to upload an object if the size of an object is huge.<br></br> 
+# Security:<br></br> 
+Organizations can store their application logs and data dumps in s3 so they must ask you for the security. AWS focuses much more on security. Aws provide organization with a lot of security option like you can upload your data in s3 bucket with encrtypion there are two things encryption at rest and encryption at transit. Aws supports both. AWS also has ACLs(Access control lists, bucket policies like you can restrict who can access the objects, we can also lock the objects in buckets). We can also enable access logging to capture detailed records of requests made to your s3 bucket.<br></br> 
+# Cost Effective<br></br> 
+S3 bucket is very cheap but it also depends on the storage class that you are using. Read more about s3 storage classes from abgishek document of day 9 and from aws documentation.<br></br> 
+very cheap s3 service is S3 Glacier Deep Archive.<br></br> 
 
