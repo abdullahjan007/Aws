@@ -914,4 +914,11 @@ Amazon S3 is a global service because it can be accessed from anywhere, but each
 
 Let suppose you add some data in s3 bucket. Now if that data gets deleted from your local system like laptop or pc then still you have it in your s3. Everything in s3 is called as an object. Its either videos, photos, movies, db etc they all called as an object.
 Now take a scenario kay let suppose your availability zone gets down in which you have your s3 and we already said that s3 is highly available and we have store data dumps and confidential data in it so what happens if s3 gets down. It’s a concerning issue if organization confidential data gets down. The answer lies in the number 99.99999999999. AWS claims that if you add 1 billion objects in s3 over a period of 100 years then there’s a chance kay only 1 object gets deleted this is how much s3 service is reliable. The reason behind this relability is kay in one region there are multiple availability zones and in each availability zones there are multiple data centers so aws replicates this bucket kay if one az gets down, its still available from other az as well.  <br></br>
+# Advantages of s3:<br></br>
+The following is the advantages of s3:<br></br>
+Scalability and Durability (S3 is 99.99999999999) percent reliable and durable<br></br>
+Availability<br></br>
+Security<br></br>
+Cost Effective <br></br>
+Performance (If you create s3 in a region nearby you then you can quickly access the content, download it and use it and quickly upload it and one more thing regarding performance is kay if you want to upload some file and that file is around 400TB or while upload you face some power cut issue or internet issue and upload takes some days  then what happens? AWS comes with a concept called multi-part upload in this you divide the file to upload in chunks like you divide into multiple 100MB chunks.<br></br>
 
