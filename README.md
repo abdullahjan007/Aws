@@ -651,7 +651,18 @@ We will create a project.. In this project we have a VPC and in that VPC we have
 Our server/ec2 is in a private subnet so they don’t have a public IP and we cannot ssh into these instances directly and can’t create public ip address for it so what we can do?.. we can create a bastion host or jump host in public subnet and through that we can connect to our ec2 instance in private subnet. Flow is -> we first connect to bastion host and then from bastion host we connect to our ec2. With bastion we have a proper logging mechanism etc. <br></br>
 
 # Q: What is Elastic IP address? <br></br>
-Elastic ip address in aws is nothing but an ip address that will remain the same even if instance is deleted or terminated, we can also say it as a static ip address. Let’s take an example, if we assign an elastic ip to an ec2 instance then if the ec2 instance goes down and come back the ip still remains the same. <br></br>
+Elastic ip address in aws is nothing but an ip address that will remain the same even if instance is deleted or terminated (not cnfrm), we can also say it as a static ip address. Let’s take an example, if we assign an elastic ip to an ec2 instance then if the ec2 instance goes down and come back the ip still remains the same. <br></br>
+# 🌐 Public IP<br></br>
+A public IP is an address given to a server so it can be reached from the internet.<br></br>
+It is automatically assigned when you start a cloud server (like an EC2 instance).<br></br>
+Problem:<br></br>
+If you stop or restart the server, this IP can change.<br></br>
+Think of it like a temporary phone number 📱.<br></br>
+# 🔒 Elastic IP (EIP)<br></br>
+An Elastic IP is a fixed (static) public IP provided by cloud services like AWS.<br></br>
+It does not change, even if you stop or restart the server.<br></br>
+You can move it from one server to another if something fails.<br></br>
+Think of it like a permanent phone number ☎️.<br></br>
 
 # AutoScaling Group:<br></br>
 Autoscaling group in aws can’t be created directly we can use the launch template. So why you need the launch template? Because we can use this launch template across multiple autoscaling groups or this template acts as a reference like tomorrow if I want to understand kay how my autoscaling group behaving.. is my autoscaling group scaling one instance, 10 instance, 100 instance so we can use this launch template as a reference.easy wording may samjho like mainey 3 templates bna liye aur template1 10 instances launch/scale karta ha, isi tarha template2 100 instances so on so forth tou ab ager mujhe 100 instance scaling chahiye tou ma us kay sath template2 link kr du ga (not cnfrm) <br></br>
