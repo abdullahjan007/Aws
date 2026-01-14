@@ -936,3 +936,137 @@ Organizations can store their application logs and data dumps in s3 so they must
 S3 bucket is very cheap but it also depends on the storage class that you are using. Read more about s3 storage classes from abgishek document of day 9 and from aws documentation.<br></br> 
 very cheap s3 service is S3 Glacier Deep Archive.<br></br> 
 
+# Abhishek concept of s3 versioning:<br></br> 
+We can use multiple things in s3 buckets..Let suppose we add application log files on day1, next day I added the log file of same application and on the third day i added the logs of same application…Take an example of git for better understanding let suppose we have a code file, next day the code file got updated and third day the developer said the file..that was updated on yesterday was wrong I want my code of first day…so you simple revert and make that version available same things goes with  s3 bucket it also works on versioning but if versioning is disabled then it completely replaces or overrides the previous file and won’t keep track of any record or history but If versioning is enabled in s3 bucket then multiple versions of same thing is created. Learn gpt perspective for better underst<br></br> 
+
+# Q: What is s3 bucket versioning concept? Explain this concept in easy wording with real-life examples.<br></br> 
+Amazon S3 bucket versioning is a feature that keeps multiple versions of the same file in an S3 bucket instead of replacing or permanently deleting it.<br></br> 
+Think of it as automatic “Save History” for files 📂<br></br> 
+________________________________________<br></br> 
+Simple definition<br></br> 
+S3 Versioning = S3 remembers every change made to an object (file).<br></br> 
+Whenever you:<br></br> 
+•	Upload a new file with the same name<br></br> 
+•	Modify a file<br></br> 
+•	Delete a file<br></br> 
+👉 S3 keeps the old version instead of losing it<br></br> 
+________________________________________<br></br> 
+Real-life example (very easy)<br></br> 
+📝 Example 1: Google Docs / MS Word history<br></br> 
+You write a document:<br></br> 
+•	Version 1: Draft<br></br> 
+•	Version 2: Added introduction<br></br> 
+•	Version 3: Final copy<br></br> 
+Even if you make a mistake, you can go back to any previous version.<br></br> 
+➡️ S3 versioning works the same way<br></br> 
+________________________________________<br></br> 
+How it works in S3 (simple flow)<br></br> 
+Case 1: Upload same file again<br></br> 
+You upload:<br></br> 
+resume.pdf<br></br> 
+Then you upload another resume.pdf (updated one).<br></br> 
+With versioning ON:<br></br> 
+•	S3 stores both files<br></br> 
+•	Each gets a unique version ID<br></br> 
+resume.pdf (version 1)<br></br> 
+resume.pdf (version 2)<br></br> 
+Nothing is overwritten ❌<br></br> 
+________________________________________<br></br> 
+Case 2: Delete a file<br></br> 
+You delete resume.pdf.<br></br> 
+With versioning ON:<br></br> 
+•	File is not actually deleted<br></br> 
+•	S3 adds a delete marker<br></br> 
+You can still restore the file later ✔️<br></br> 
+________________________________________<br></br> 
+Case 3: Accidentally changed data<br></br> 
+You updated a file with wrong data.<br></br> 
+With versioning:<br></br> 
+•	Just rollback to the previous version<br></br> 
+•	No data loss 👍<br></br> 
+________________________________________<br></br> 
+Real-life analogy: School notebook 📘<br></br> 
+Imagine:<br></br> 
+•	You write with pencil<br></br> 
+•	Teacher asks you to erase something<br></br> 
+•	You regret it later<br></br> 
+❌ Without versioning → Content is gone<br></br> 
+✔️ With versioning → You have photocopies of every page change<br></br> 
+________________________________________<br></br> 
+Why versioning is useful (important benefits)<br></br> 
+✔️ Protects from accidental deletion<br></br> 
+✔️ Protects from overwriting files<br></br> 
+✔️ Helps in data recovery<br></br> 
+✔️ Required for backup & compliance<br></br> 
+✔️ Works with S3 replication & backups<br></br> 
+________________________________________<br></br> 
+Important points to remember<br></br> 
+•	Versioning is set at bucket level<br></br> 
+•	Once enabled, it cannot be disabled, only suspended<br></br> 
+•	Each version costs storage money<br></br> 
+•	Old versions stay until you delete them manually or via lifecycle rules<br></br> 
+________________________________________<br></br> 
+One-line summary<br></br> 
+S3 bucket versioning keeps a history of all file changes so you can recover deleted or overwritten data anytime.<br></br> 
+
+# Q: If versioning is disabled then what happened if i upload the same file? or same file with a little bit changes in it?
+When S3 Versioning is DISABLED<br></br> 
+Rule (very important):<br></br> 
+S3 keeps only ONE copy of a file. No history.<br></br> 
+________________________________________<br></br> 
+Case 1: Upload the same file again (same name)<br></br> 
+Example:<br></br> 
+You upload:<br></br> 
+report.pdf<br></br> 
+Later, you upload another report.pdf (same file or updated one).<br></br> 
+What happens?<br></br> 
+•	The new file replaces the old file<br></br> 
+•	The old file is permanently lost<br></br> 
+•	❌ No backup<br></br> 
+•	❌ No rollback<br></br> 
+📌 S3 doesn’t care whether the content changed or not — filename is what matters<br></br> 
+________________________________________<br></br> 
+Case 2: Upload same file with small changes<br></br> 
+Example:<br></br> 
+•	Old file: salary.xlsx (January data)<br></br> 
+•	New file: salary.xlsx (February data)<br></br> 
+What happens?<br></br> 
+•	S3 overwrites the old file<br></br> 
+•	Only the latest version exists<br></br> 
+•	You cannot recover January data<br></br> 
+________________________________________<br></br> 
+Case 3: Delete a file<br></br> 
+Example:<br></br> 
+You delete image.jpg.<br></br> 
+What happens?<br></br> 
+•	File is permanently deleted<br></br> 
+•	❌ No delete marker<br></br> 
+•	❌ No restore option<br></br> 
+________________________________________<br></br> 
+Simple comparison table<br></br> 
+Action	Versioning OFF	Versioning ON<br></br> 
+Upload same filename	Old file overwritten	New version created<br></br> 
+Upload changed file	Old data lost	Old version preserved<br></br> 
+Delete file	Permanently deleted	Delete marker added<br></br> 
+Recover old data	❌ Impossible	✔️ Possible<br></br> 
+________________________________________<br></br> 
+Real-life example 🧠<br></br> 
+Without versioning = Writing on a whiteboard<br></br> 
+•	You erase old content<br></br> 
+•	It’s gone forever<br></br> 
+With versioning = Writing in a notebook<br></br> 
+•	Old pages stay<br></br> 
+•	You can go back anytime<br></br> 
+________________________________________<br></br> 
+One-line summary<br></br> 
+When versioning is disabled, uploading a file with the same name simply replaces the old file — no history, no recovery.<br></br> 
+# Tags in s3 buckets:<br></br> 
+It is basically used for identifying. We have multiple s3 buckets across multiple accounts so we used tags if someone asks kay I want all the buckets that store the file for transaction project so at that point tags become useful.<br></br> 
+# Object Locking:<br></br> 
+Once we upload the object in bucket we lock it so no one can access it. Its for security reasons. We can also use the bucket locking concept if someone wants to override the bucket/object and we want to restrict it then we use bucket locking.<br></br> 
+# Default Encryption:<br></br> 
+S3 recently added the default encryption means now objects are bydefault encrypted.<br></br> 
+# Access Logging:<br></br> 
+Bydefault it is disabled, It is used so we can check who can access our bucket, what kind of actions they are performing and also we can restrict them as well.<br></br> 
+
+
