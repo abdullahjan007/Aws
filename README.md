@@ -1068,5 +1068,6 @@ Once we upload the object in bucket we lock it so no one can access it. Its for 
 S3 recently added the default encryption means now objects are bydefault encrypted.<br></br> 
 # Access Logging:<br></br> 
 Bydefault it is disabled, It is used so we can check who can access our bucket, what kind of actions they are performing and also we can restrict them as well.<br></br> 
-
+# S3 Bucket Demo1 on Permission:<br></br> 
+Let suppose you are working in an organization as a devops engineer and in that organization you create IAM users in which you set a policy kay all people in organization have full access to s3.. Now everyone in an organization have full access to s3 but there's a one bucket which contains very sensitive data and you want to restrict other people to access that bucket although you give all access in IAM policy but being a bucket owner you can restrict the access for that specific bucket by setting the permissions (in permissions you add some json which means you restrict all user except you to access the bucket). So, if you misconfigured the policy at IAM time you can still restrict the access by setting the bucket permissions. This is just one usecase you can work on multiple usecases like this. DO this on weekend<br></br>
 
