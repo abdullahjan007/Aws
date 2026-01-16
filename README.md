@@ -1182,3 +1182,4 @@ Object Lock can ONLY be enabled when creating a new bucket<br></br>
 You cannot enable it on an existing bucket<br></br>
 
 Versioning is required (AWS enables it automatically)<br></br>
+Once Amazon S3 Object Lock is enabled, you can't disable Object Lock or suspend Versioning for the bucket.<br></br>
