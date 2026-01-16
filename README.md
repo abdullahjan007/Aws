@@ -1075,3 +1075,103 @@ Let suppose you are working in an organization as a devops engineer and in that 
 In order to host static website we need to do 3 things, first enable static website hosting option, then disable block all public access, add then bucket policy by allowing s3:GetObject and<br></br>
 S3 is very cheap to host a static website as compared to other hosting platforms. <br></br>
 If we use rich JavaScript like the javascript code in which apis are used then we use something called CORS which will be discussed in detail when we do Cloudfront or CDN <br></br>
+
+# Object Lock in S3 bucket<br></br>
+# 🧠 Simple definition (one line)<br></br>
+
+S3 Object Lock prevents files from being deleted or changed for a fixed time — even by admins.<br></br>
+
+# 🧩 Real-life example (best way to understand)<br></br>
+🗄️ Bank locker example<br></br>
+
+Imagine a bank locker:<br></br>
+
+You put important documents inside<br></br>
+
+You tell the bank:<br></br>
+
+“Do NOT allow anyone to remove or change these documents for 5 years”<br></br>
+
+Even:<br></br>
+
+bank employees ❌<br></br>
+
+branch manager ❌<br></br>
+
+you ❌<br></br>
+
+No one can touch it until 5 years pass<br></br>
+
+➡️ That’s Object Lock.<br></br>
+
+# 🧾 Another real example: Exam papers<br></br>
+
+A university stores exam papers:<br></br>
+
+Once uploaded, they must:<br></br>
+
+not be changed<br></br>
+
+not be deleted<br></br>
+
+For 10 years (legal requirement)<br></br>
+
+Object Lock ensures:<br></br>
+
+no cheating<br></br>
+
+no accidental deletion<br></br>
+
+full compliance<br></br>
+
+# 🧩 How Object Lock works in S3 (simple words)<br></br>
+
+When Object Lock is ON:<br></br>
+
+Files become write-once<br></br>
+
+You cannot delete<br></br>
+
+You cannot overwrite<br></br>
+
+Only after time expires → file is normal again<br></br>
+
+# 🔒 Two Object Lock modes (very important)<br></br>
+# 1️⃣ Governance Mode (soft lock)<br></br>
+
+👨‍💼 Example:<br></br>
+
+Company rule: “Keep logs for 1 year”<br></br>
+
+Admins can override with special permission<br></br>
+
+✔ Protects from mistakes<br></br>
+❌ Can be overridden by high-level admin<br></br>
+
+# 2️⃣ Compliance Mode (hard lock 🔥)<br></br>
+
+🏛️ Example:<br></br>
+
+Legal / government records<br></br>
+
+Even root user CANNOT delete<br></br>
+
+✔ Strongest protection<br></br>
+✔ Meets legal compliance<br></br>
+❌ Cannot be bypassed<br></br>
+
+⏱️ Retention period<br></br>
+
+You must set:<br></br>
+
+1 day<br></br>
+
+1 year<br></br>
+
+10 years<br></br>
+
+or a specific date<br></br>
+
+Example:<br></br>
+
+“Lock this file until 1 Jan 2030”<br></br>
