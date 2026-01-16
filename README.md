@@ -1175,3 +1175,10 @@ or a specific date<br></br>
 Example:<br></br>
 
 “Lock this file until 1 Jan 2030”<br></br>
+
+# 2️⃣ Important Point Regarding Object Lock<br></br>
+Object Lock can ONLY be enabled when creating a new bucket<br></br>
+
+You cannot enable it on an existing bucket<br></br>
+
+Versioning is required (AWS enables it automatically)<br></br>
