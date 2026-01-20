@@ -1192,3 +1192,4 @@ There are two ways to access any application like one with UI and other with API
 POST api.aws.com/s3/create <br></br>
 If we are python or anyother developer we use this api in our code using request model or any other model and also add some parameters in code like bucket versioning or bucket name then our resource is created on aws<br></br>
 Inshort, scene ye hota ha kay jb apney api kay through resource creation, deletion, ya management karwani hoti ha tou jo app owner hota ha wo kehta ha ye meri api ha is ko jo bhi HTTP request ha POST ya GET ki us kay sath use kro aur jo bhi parameters wagera denay hain sath wo apney program may add kr do aur phir tumhara resource create ho jye ga..(not cnfrm)
+AWS CLI acts as a layer between User and API. User<->CLI<->API
