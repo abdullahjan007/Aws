@@ -1519,3 +1519,201 @@ AWS Resource and Property Types Reference<br></br>
 Intrinsic Functions<br></br>
 
 (These are exact AWS documentation topics)<br></br>
+
+I have some confusions but they all are clear now after reading the following context:<br></br>
+
+# First: What does ! mean again?<br></br>
+
+👉 ! means “call a CloudFormation function”<br></br>
+It does NOT mean NOT / opposite.<br></br>
+
+So:<br></br>
+
+!Ref → call Ref function<br></br>
+
+!GetAtt → call GetAtt function<br></br>
+
+!Sub → call Sub function<br></br>
+
+# 1️⃣ !Ref — “Give me the value”<br></br>
+# Real-life example 🧠<br></br>
+
+You ask your friend:<br></br>
+
+“What is your name?”<br></br>
+
+Friend replies:<br></br>
+
+“Rahul”<br></br>
+
+You refer to your friend → you get his value (name).<br></br>
+
+That’s exactly what !Ref does.<br></br>
+
+# In simple words<br></br>
+
+!Ref means: “Give me the value of this thing”<br></br>
+
+That “thing” can be:<br></br>
+
+a Parameter<br></br>
+
+a Resource<br></br>
+
+# Example 1: !Ref with Parameter<br></br>
+Parameters:<br></br>
+  InstanceType:<br></br>
+    Type: String<br></br>
+    Default: t2.micro<br></br>
+
+
+Now use it:<br></br>
+
+InstanceType: !Ref InstanceType<br></br>
+
+# Meaning in English:<br></br>
+
+“Use the value that the user gave for InstanceType”<br></br>
+
+If user selected:<br></br>
+
+t2.small → EC2 becomes t2.small<br></br>
+
+# Example 2: !Ref with Resource<br></br>
+Resources:<br></br>
+  MyBucket:<br></br>
+    Type: AWS::S3::Bucket<br></br>
+
+Value: !Ref MyBucket<br></br>
+
+# Meaning:<br></br>
+
+“Give me the bucket name”<br></br>
+
+# Memory trick 🧠<br></br>
+
+🟢 !Ref = What is its value?<br></br>
+
+# 2️⃣ !GetAtt — “Give me a specific detail”<br></br>
+# Real-life example 🧠<br></br>
+
+You ask your friend:<br></br>
+
+“What is your phone number?”<br></br>
+
+You already know the person,<br></br>
+but now you want one specific detail.<br></br>
+
+# In simple words<br></br>
+
+!GetAtt means: “Get a specific attribute of a resource”<br></br>
+
+# Example: EC2 public IP<br></br>
+Resources:<br></br>
+  MyEC2:<br></br>
+    Type: AWS::EC2::Instance<br></br>
+
+Value: !GetAtt MyEC2.PublicIp<br></br>
+
+# Meaning in English:<br></br>
+
+“Give me the public IP address of MyEC2”<br></br>
+
+# Why not !Ref here?<br></br>
+
+Because:<br></br>
+
+!Ref gives main ID<br></br>
+
+!GetAtt gives extra details<br></br>
+
+# Common attributes:<br></br>
+Resource	Attribute<br></br>
+EC2	PublicIp, PrivateIp<br></br>
+ALB	DNSName<br></br>
+IAM Role	Arn<br></br>
+S3	Arn<br></br>
+# Memory trick 🧠<br></br>
+
+🔵 !GetAtt = Tell me one property<br></br>
+
+# 3️⃣ !Sub — “Replace values inside text”<br></br>
+# Real-life example 🧠<br></br>
+
+You write a message:<br></br>
+
+“Hello NAME, welcome to CITY”<br></br>
+
+Later you replace:<br></br>
+
+NAME → Rahul<br></br>
+
+CITY → Delhi<br></br>
+
+# Final message:<br></br>
+
+“Hello Rahul, welcome to Delhi”<br></br>
+
+That is exactly !Sub.<br></br>
+
+# In simple words<br></br>
+
+!Sub means: Replace variables inside a string<br></br>
+
+# Example:<br></br>
+!Sub "My instance is running in ${AWS::Region}"<br></br>
+
+# Meaning:<br></br>
+
+Replace ${AWS::Region} with actual region name<br></br>
+
+# Output:<br></br>
+
+My instance is running in us-east-1<br></br>
+
+# Using !Sub with your own resources<br></br>
+!Sub "EC2 public IP is ${MyEC2.PublicIp}"<br></br>
+
+
+AWS understands:<br></br>
+
+MyEC2.PublicIp → GetAtt automatically<br></br>
+
+# Why !Sub is useful?<br></br>
+
+Without !Sub, text would be static<br></br>
+With !Sub, text becomes dynamic<br></br>
+
+# Memory trick 🧠<br></br>
+
+🟣 !Sub = Fill the blanks<br></br>
+
+# 🔥 All three together (Very common)<br></br>
+Outputs:<br></br>
+  Message:<br></br>
+    Value: !Sub "Instance ${MyEC2} is of type ${InstanceType}"<br></br>
+
+# What happens:<br></br>
+
+${MyEC2} → Ref<br></br>
+
+${InstanceType} → Ref<br></br>
+
+Everything replaced automatically<br></br>
+
+# 🧾 Comparison table (SUPER IMPORTANT)<br></br>
+Function	Meaning	Think like<br></br>
+!Ref	Get value	“What is it?”<br></br>
+!GetAtt	Get detail	“Tell me more”<br></br>
+!Sub	Replace text	“Fill blanks”<br></br>
+# One-line interview answers 🎯<br></br>
+
+!Ref: Returns the value of a parameter or resource<br></br>
+
+!GetAtt: Returns a specific attribute of a resource<br></br>
+
+!Sub: Substitutes variables in a string<br></br>
+
+# Final easy memory sentence 🧠<br></br>
+
+Ref asks WHAT, GetAtt asks WHICH DETAIL, Sub fills TEXT<br></br>
