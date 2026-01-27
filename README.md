@@ -1216,3 +1216,4 @@ The main feature of CFT is infrastructure creation but it have other features as
 Now we understand that kay we have to write yaml files which is our cloud formation template but we write this on our local system then how we can move these templates to cloud? When we go to cft service on aws then there's an option called stacks..when we go to stacks and click an option named "create stack" then we actually move these yaml templates from our local system to aws <br></br> 
 The mandatory thing in cft yaml file is resources section...Without resources section we are unable to make cft.. rest of the other things are optional..<br></br> 
 In yaml file following things are present..version,description,metadata,parameters,rules,mapping,conditions,resources(mandotry thing),output <br></br>
+AWS offical documentation on Cloud Formation Template is recommended <br></br>
