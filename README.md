@@ -1717,3 +1717,151 @@ Function	Meaning	Think like<br></br>
 # Final easy memory sentence 🧠<br></br>
 
 Ref asks WHAT, GetAtt asks WHICH DETAIL, Sub fills TEXT<br></br>
+
+# 1️⃣ MAPPINGS (Think of it like a DICTIONARY / LOOKUP TABLE)<br></br>
+# Real-life example first 🧠<br></br>
+
+Imagine this school uniform rule:<br></br>
+
+City	Uniform Color<br></br>
+Delhi	Blue<br></br>
+Mumbai	White<br></br>
+Chennai	Yellow<br></br>
+
+👉 If a student is in Delhi, uniform = Blue<br></br>
+👉 If in Mumbai, uniform = White<br></br>
+
+❗ Student cannot choose the color<br></br>
+❗ It is fixed by school rules<br></br>
+
+This table is exactly what Mappings are.<br></br>
+
+# Now in CloudFormation terms ☁️<br></br>
+What is a Mapping?<br></br>
+
+A Mapping is a fixed table of values<br></br>
+CloudFormation looks up a value based on something else (like region).<br></br>
+
+You define values once, and AWS picks the right one automatically.<br></br>
+
+# Why do we need Mappings?<br></br>
+
+Because some things change by region, for example:<br></br>
+
+AMI ID (Amazon Machine Image)<br></br>
+
+Availability Zone names<br></br>
+
+Region-specific settings<br></br>
+
+But your template should remain same.<br></br>
+
+# Simple AWS Example (AMI per region)<br></br>
+Real problem:<br></br>
+
+AMI in us-east-1 is different<br></br>
+
+AMI in ap-south-1 is different<br></br>
+
+You don’t want separate templates for each region.<br></br>
+
+# Mapping Example (Very Simple)<br></br>
+Mappings:<br></br>
+  RegionMap:<br></br>
+    us-east-1:<br></br>
+      AMI: ami-11111111<br></br>
+    ap-south-1:<br></br>
+      AMI: ami-22222222<br></br>
+
+# How to read this in plain English:<br></br>
+
+“If region is us-east-1 → use ami-11111111<br></br>
+If region is ap-south-1 → use ami-22222222”<br></br>
+
+# How AWS uses the Mapping<br></br>
+ImageId: !FindInMap [RegionMap, !Ref AWS::Region, AMI]<br></br>
+
+# Meaning (human language):<br></br>
+
+Check current AWS region<br></br>
+
+Go to RegionMap<br></br>
+
+Find that region<br></br>
+
+Pick the AMI value<br></br>
+
+# Mapping = FIXED RULES 📌<br></br>
+Feature	Mapping<br></br>
+User input?	❌ No<br></br>
+Change at runtime?	❌ No<br></br>
+Best for	Region-based values<br></br>
+Like	Dictionary / Table<br></br>
+
+# 2️⃣ CONDITIONS (Think of YES / NO decisions)<br></br>
+# Real-life example first 🧠<br></br>
+
+Imagine this rule:<br></br>
+
+“If it is raining, take an umbrella.”<br></br>
+
+Raining? → ✅ Umbrella<br></br>
+
+Not raining? → ❌ No umbrella<br></br>
+
+This is Condition logic.<br></br>
+
+# Another real-life example (Even clearer)<br></br>
+Office rule:<br></br>
+
+“If employee is Manager, give Company Car”<br></br>
+
+Role	Company Car<br></br>
+Manager	Yes<br></br>
+Employee	No<br></br>
+
+👉 Decision is based on a condition<br></br>
+
+# Now in CloudFormation ☁️<br></br>
+What is a Condition?<br></br>
+
+A Condition decides whether:<br></br>
+
+A resource is created<br></br>
+
+A property is applied<br></br>
+
+It always results in:<br></br>
+✔ TRUE<br></br>
+❌ FALSE<br></br>
+
+# Simple AWS Example (Environment based)<br></br>
+User chooses environment:<br></br>
+
+dev<br></br>
+
+prod<br></br>
+
+# Step 1: Parameter<br></br>
+Parameters:<br></br>
+  Environment:<br></br>
+    Type: String<br></br>
+    Default: dev<br></br>
+
+
+User chooses dev or prod<br></br>
+
+# Step 2: Condition<br></br>
+Conditions:<br></br>
+  IsProd: !Equals [!Ref Environment, prod]<br></br>
+
+# Meaning in English:<br></br>
+
+“If Environment equals prod, then IsProd = TRUE<br></br>
+Otherwise IsProd = FALSE”<br></br>
+
+# Step 3: Use condition in resource<br></br>
+Resources:<br></br>
+  BackupBucket:<br></br>
+    Type: AWS::S3::Bucket<br></br>
+    Condition: IsProd<br></br>
