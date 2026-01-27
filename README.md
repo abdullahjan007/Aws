@@ -1217,3 +1217,305 @@ Now we understand that kay we have to write yaml files which is our cloud format
 The mandatory thing in cft yaml file is resources section...Without resources section we are unable to make cft.. rest of the other things are optional..<br></br> 
 In yaml file following things are present..version,description,metadata,parameters,rules,mapping,conditions,resources(mandotry thing),output <br></br>
 AWS offical documentation on Cloud Formation Template is recommended <br></br>
+
+What is AWS CloudFormation (CFT)?<br></br>
+
+AWS CloudFormation is a service that helps you create AWS resources automatically using a template file.<br></br>
+
+👉 Instead of clicking in the AWS console again and again,<br></br>
+👉 you write everything once in a template,<br></br>
+👉 AWS reads it and creates resources for you.<br></br>
+
+Think of it as:<br></br>
+
+“Infrastructure as Code”<br></br>
+
+That means:<br></br>
+
+Your servers<br></br>
+
+Databases<br></br>
+
+Networks<br></br>
+are written as code (YAML or JSON)<br></br>
+
+What is a CloudFormation Template?<br></br>
+
+A CloudFormation Template is a text file written in:<br></br>
+
+YAML (recommended & easy)<br></br>
+
+or JSON<br></br>
+
+This file tells AWS:<br></br>
+
+What resources to create<br></br>
+
+How they should be connected<br></br>
+
+What values to use<br></br>
+
+Basic Structure of a CloudFormation Template<br></br>
+
+A CloudFormation template has sections.<br></br>
+
+Not all sections are mandatory, but these are the most common:<br></br>
+
+AWSTemplateFormatVersion<br></br>
+Description<br></br>
+Parameters<br></br>
+Mappings<br></br>
+Conditions<br></br>
+Resources<br></br>
+Outputs<br></br>
+
+We will explain each one clearly 👇<br></br>
+
+1️⃣ AWSTemplateFormatVersion<br></br>
+What it is:<br></br>
+
+Tells AWS which version of CloudFormation template you are using<br></br>
+
+Is it mandatory?<br></br>
+
+❌ No, but recommended<br></br>
+
+Example:<br></br>
+AWSTemplateFormatVersion: '2010-09-09'<br></br>
+
+
+👉 AWS currently uses this date format.<br></br>
+
+2️⃣ Description<br></br>
+What it is:<br></br>
+
+A simple text explanation of what your template does<br></br>
+
+Rules:<br></br>
+
+Must be one line<br></br>
+
+Cannot use line breaks<br></br>
+
+Example:<br></br>
+Description: This template creates an EC2 instance with a security group<br></br>
+
+3️⃣ Parameters<br></br>
+What are Parameters?<br></br>
+
+Parameters let you ask the user for input.<br></br>
+
+Instead of hardcoding values, you can ask:<br></br>
+
+Instance type?<br></br>
+
+Key pair name?<br></br>
+
+Environment (dev/prod)?<br></br>
+
+Why use Parameters?<br></br>
+
+✔ Reusable templates<br></br>
+✔ Flexible<br></br>
+✔ Easy to change values<br></br>
+
+Example Parameter:<br></br>
+Parameters:<br></br>
+  InstanceType:<br></br>
+    Type: String<br></br>
+    Default: t2.micro<br></br>
+    Description: EC2 instance type<br></br>
+
+Explanation:<br></br>
+
+InstanceType → parameter name<br></br>
+
+Type: String → value must be text<br></br>
+
+Default → value used if user doesn’t give one<br></br>
+
+Description → help text<br></br>
+
+Common Parameter Types:<br></br>
+Type	Meaning<br></br>
+String	Text value<br></br>
+Number	Numeric value<br></br>
+AWS::EC2::KeyPair::KeyName	EC2 key pair<br></br>
+AWS::EC2::VPC::Id	VPC ID<br></br>
+CommaDelimitedList	List of values<br></br>
+4️⃣ Mappings<br></br>
+What are Mappings?<br></br>
+
+Mappings are fixed values based on conditions like region.<br></br>
+
+Example:<br></br>
+
+AMI ID for us-east-1<br></br>
+
+Different AMI for ap-south-1<br></br>
+
+User cannot change mapping values.<br></br>
+Example:<br></br>
+Mappings:<br></br>
+  RegionMap:<br></br>
+    us-east-1:<br></br>
+      AMI: ami-0abcdef123<br></br>
+    ap-south-1:<br></br>
+      AMI: ami-0123456789<br></br>
+
+How to use it:<br></br>
+ImageId: !FindInMap [RegionMap, !Ref AWS::Region, AMI]<br></br>
+
+
+👉 AWS finds the correct AMI based on region.<br></br>
+
+5️⃣ Conditions<br></br>
+What are Conditions?<br></br>
+
+Conditions let you create resources only if a condition is true.<br></br>
+
+Example:<br></br>
+
+Create resource only in prod<br></br>
+
+Enable backup only if user says “yes”<br></br>
+
+Example:<br></br>
+Parameters:<br></br>
+  Environment:<br></br>
+    Type: String<br></br>
+    Default: dev<br></br>
+
+Conditions:<br></br>
+  IsProd: !Equals [!Ref Environment, prod]<br></br>
+
+Use Condition in a resource:<br></br>
+Condition: IsProd<br></br>
+
+6️⃣ Resources (MOST IMPORTANT)<br></br>
+What is Resources?<br></br>
+
+This section is where you actually create AWS resources.<br></br>
+
+👉 Without this section, nothing is created.<br></br>
+
+General Format:<br></br>
+Resources:<br></br>
+  LogicalName:<br></br>
+    Type: AWS::Service::Resource<br></br>
+    Properties:<br></br>
+      PropertyName: value<br></br>
+
+Example: Create EC2 Instance<br></br>
+Resources:<br></br>
+  MyEC2Instance:<br></br>
+    Type: AWS::EC2::Instance<br></br>
+    Properties:<br></br>
+      InstanceType: !Ref InstanceType<br></br>
+      ImageId: ami-0abcdef123<br></br>
+      KeyName: my-key<br></br>
+
+Explanation:<br></br>
+
+MyEC2Instance → logical name (used inside template)<br></br>
+
+Type → resource type from AWS<br></br>
+
+Properties → settings of the resource<br></br>
+
+Common Resource Types:<br></br>
+Resource	Type<br></br>
+EC2	AWS::EC2::Instance<br></br>
+S3	AWS::S3::Bucket<br></br>
+IAM Role	AWS::IAM::Role<br></br>
+Security Group	AWS::EC2::SecurityGroup<br></br>
+RDS	AWS::RDS::DBInstance<br></br>
+7️⃣ Outputs<br></br>
+What are Outputs?<br></br>
+
+Outputs show useful values after stack creation.<br></br>
+
+Example:<br></br>
+
+EC2 Public IP<br></br>
+
+Load Balancer DNS name<br></br>
+
+S3 bucket name<br></br>
+
+Example:<br></br>
+Outputs:<br></br>
+  InstanceId:<br></br>
+    Description: EC2 Instance ID<br></br>
+    Value: !Ref MyEC2Instance<br></br>
+
+Important CloudFormation Functions (Easy)<br></br>
+🔹 !Ref<br></br>
+
+Gets value of:<br></br>
+
+Parameter<br></br>
+
+Resource ID<br></br>
+
+InstanceType: !Ref InstanceType<br></br>
+
+🔹 !GetAtt<br></br>
+
+Gets attribute of a resource<br></br>
+
+!GetAtt MyEC2Instance.PublicIp<br></br>
+
+🔹 !Sub<br></br>
+
+Used for string substitution<br></br>
+
+!Sub "My instance is in ${AWS::Region}"<br></br>
+
+Full Simple CloudFormation Template Example<br></br>
+AWSTemplateFormatVersion: '2010-09-09'<br></br>
+Description: Simple EC2 creation using CloudFormation<br></br>
+
+Parameters:<br></br>
+  InstanceType:<br></br>
+    Type: String<br></br>
+    Default: t2.micro<br></br>
+
+Resources:<br></br>
+  MyEC2:<br></br>
+    Type: AWS::EC2::Instance<br></br>
+    Properties:<br></br>
+      InstanceType: !Ref InstanceType<br></br>
+      ImageId: ami-0abcdef123<br></br>
+
+Outputs:<br></br>
+  EC2Id:<br></br>
+    Value: !Ref MyEC2<br></br>
+
+How CloudFormation Works (Flow)<br></br>
+
+1️⃣ Write template (YAML/JSON)<br></br>
+2️⃣ Upload to CloudFormation<br></br>
+3️⃣ Create Stack<br></br>
+4️⃣ AWS creates resources<br></br>
+5️⃣ Stack manages everything<br></br>
+
+Benefits of CloudFormation (From AWS Docs)<br></br>
+
+✔ Infrastructure as Code<br></br>
+✔ Version control<br></br>
+✔ Easy rollback<br></br>
+✔ Automation<br></br>
+✔ Repeatable & safe deployments<br></br>
+
+Official AWS Documentation Reference (Recommended)<br></br>
+
+You can search these in AWS Docs:<br></br>
+
+CloudFormation Template Anatomy<br></br>
+
+AWS Resource and Property Types Reference<br></br>
+
+Intrinsic Functions<br></br>
+
+(These are exact AWS documentation topics)<br></br>
