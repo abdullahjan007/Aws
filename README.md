@@ -1865,3 +1865,8 @@ Resources:<br></br>
   BackupBucket:<br></br>
     Type: AWS::S3::Bucket<br></br>
     Condition: IsProd<br></br>
+
+
+# More about CFT:
+Let suppose we create s3 bucket with cft.. AWS creates a bydefault bucket itself where it stores all the templates for us that we write.. <br></br>
+I create an s3 bucket via cft and then i go to ui and delete the entire bucket when i go to drift detection i saw a status drifted but i am unable to see any details because i deleted the entire bucket..but when i make a bucket with cft and enabled versioning and then i go to ui and disable the versioning and after this when i saw the status.. it showed me drifted and when i saw the details.. it give me the detail like what changings happened..<br></br>
