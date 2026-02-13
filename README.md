@@ -1870,3 +1870,23 @@ Resources:<br></br>
 # More about CFT:
 Let suppose we create s3 bucket with cft.. AWS creates a bydefault bucket itself where it stores all the templates for us that we write.. <br></br>
 I create an s3 bucket via cft and then i go to ui and delete the entire bucket when i go to drift detection i saw a status drifted but i am unable to see any details because i deleted the entire bucket..but when i make a bucket with cft and enabled versioning and then i go to ui and disable the versioning and after this when i saw the status.. it showed me drifted and when i saw the details.. it give me the detail like what changings happened..<br></br>
+
+# Q: What are stacks in CFT?<br></br>
+🔹 What does a stack contain?<br></br>
+A stack can include resources like:<br></br>
+EC2 instances<br></br>
+S3 buckets<br></br>
+IAM roles<br></br>
+VPCs, subnets<br></br>
+Load balancers<br></br>
+RDS databases<br></br>
+All of these are defined in a CloudFormation template (YAML or JSON), and when you deploy it, AWS creates a stack.<br></br>
+# Example <br></br>
+If your template defines:<br></br>
+1 VPC<br></br>
+2 EC2 instances<br></br>
+1 Load Balancer<br></br>
+When you deploy it:<br></br>
+AWS creates one stack<br></br>
+That stack contains all 4 resources<br></br>
+You manage them as one unit<br></br>
