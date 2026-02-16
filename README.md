@@ -1890,3 +1890,6 @@ When you deploy it:<br></br>
 AWS creates one stack<br></br>
 That stack contains all 4 resources<br></br>
 You manage them as one unit<br></br>
+
+# Additional Things regarding CFT:
+Till now we write yaml file for cft using documentation and template desginer in aws ui. Let suppose my manager gives me a very lengthy task then its very time taking kay first i go to ui then go to temnplate designer and create a template.. So, in order to save time and do work efficiently we use two plugins which make our life easy..First one is YAML by Redhat and second one is AWS toolkit.. AWS toolkit is very helpful not only in writing CloudFormation Template but in other things as well. We will discuss its detail later in this documentation<br></br> 
