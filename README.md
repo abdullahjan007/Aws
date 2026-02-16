@@ -1893,3 +1893,48 @@ You manage them as one unit<br></br>
 
 # Additional Things regarding CFT:
 Till now we write yaml file for cft using documentation and template desginer in aws ui. Let suppose my manager gives me a very lengthy task then its very time taking kay first i go to ui then go to temnplate designer and create a template.. So, in order to save time and do work efficiently we use two plugins which make our life easy..First one is YAML by Redhat and second one is AWS toolkit.. AWS toolkit is very helpful not only in writing CloudFormation Template but in other things as well. We will discuss its detail later in this documentation<br></br> 
+
+# CFT to create an EC2 Instance<br></br> 
+AWSTemplateFormatVersion: "2010-09-09"<br></br> 
+Description: "My First EC2 Instance"<br></br> 
+Parameters:<br></br> 
+  InstanceType:<br></br> 
+    Description: "EC2 Instance Type"<br></br> 
+    Type: String  <br></br> 
+    Default: t2.micro<br></br> 
+    AllowedValues: <br></br> 
+      - t2.micro<br></br> 
+      - t2.small<br></br> 
+      - t2.medium<br></br> 
+    ConstraintDescription: "must be a valid EC2 instance type."<br></br> 
+  KeyName:<br></br> 
+    Description: "Name of an existing EC2 KeyPair to enable SSH access to the instance"<br></br> 
+    Type: AWS::EC2::KeyPair::KeyName<br></br> 
+Resources:<br></br> 
+  MyEC2Instance:<br></br> 
+    Type: AWS::EC2::Instance<br></br> 
+    Properties:<br></br> 
+      ImageId: ami-0b6c6ebed2801a5cb<br></br> 
+      InstanceType: !Ref InstanceType<br></br> 
+      KeyName: !Ref KeyName<br></br> 
+      SecurityGroupIds:<br></br> 
+        - !Ref InstanceSecurityGroup<br></br> 
+  InstanceSecurityGroup:<br></br> 
+    Type: AWS::EC2::SecurityGroup<br></br> 
+    Properties:<br></br> 
+      GroupDescription: "Enable SSH access via port 22"<br></br> 
+      SecurityGroupIngress:<br></br> 
+        - IpProtocol: tcp<br></br> 
+          FromPort: 22<br></br> 
+          ToPort: 22<br></br> 
+          CidrIp: 0.0.0.0/0<br></br> 
+Outputs:<br></br> 
+  InstanceId:<br></br> 
+    Description: "The Instance ID of the newly created EC2 instance"<br></br> 
+    Value: !Ref MyEC2Instance<br></br> 
+  InstanceType:<br></br> 
+    Description: "The EC2 instance type"<br></br> 
+    Value: !Ref InstanceType<br></br> 
+  
+
+  
