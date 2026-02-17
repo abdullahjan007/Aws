@@ -1936,5 +1936,66 @@ Outputs:<br></br>
     Description: "The EC2 instance type"<br></br> 
     Value: !Ref InstanceType<br></br> 
   
+The above yaml code is fine for default vpc but if we want to use a custom vpc we have to give vpc id and subnet id as well otherwise it gives an error.. The reason for this error is if we use custom vpc and use the vpc id in security group but our instance is created in a default vpc it gives a network mismatch error that why we have to set subnet id as well.. The code for creating ec2 instance with default vpc is as follow:<br></br>
+AWSTemplateFormatVersion: "2010-09-09"<br></br>
 
-  
+Description: "My First EC2 Instance"<br></br>
+
+Parameters:<br></br>
+  InstanceType:<br></br>
+    Description: "EC2 Instance Type"<br></br>
+    Type: String<br></br>
+    Default: t2.micro<br></br>
+    AllowedValues:<br></br>
+      - t2.micro<br></br>
+      - t2.small<br></br>
+      - t2.medium<br></br>
+    ConstraintDescription: "must be a valid EC2 instance type."<br></br>
+
+  KeyName:<br></br>
+    Description: "Name of an existing EC2 KeyPair to enable SSH access to the instance"<br></br>
+    Type: AWS::EC2::KeyPair::KeyName<br></br>
+  VPCId:<br></br>
+    Description: "ValueId for the EC2 instance"<br></br>
+    Type: AWS::EC2::VPC::Id<br></br>
+  SubnetId:<br></br>
+    Description: "Subnet ID for the EC2 instance"<br></br>
+    Type: AWS::EC2::Subnet::Id<br></br>
+Resources:<br></br>
+  InstanceSecurityGroup:<br></br>
+    Type: AWS::EC2::SecurityGroup<br></br>
+    Properties:<br></br>
+      GroupDescription: "Enable SSH access via port 22"<br></br>
+      VpcId: !Ref VPCId<br></br>
+      SecurityGroupIngress:<br></br>
+        - IpProtocol: tcp<br></br>
+          FromPort: 22<br></br>
+          ToPort: 22<br></br>
+          CidrIp: 0.0.0.0/0<br></br>
+
+  MyEC2Instance:<br></br>
+    Type: AWS::EC2::Instance<br></br>
+    Properties:<br></br>
+      ImageId: ami-0b6c6ebed2801a5cb<br></br>
+      InstanceType: !Ref InstanceType<br></br>
+      KeyName: !Ref KeyName<br></br>
+      VpcId: !Ref VPCId<br></br>
+      SubnetId: !Ref SubnetId<br></br>
+      SecurityGroupIds:<br></br>
+        - !Ref InstanceSecurityGroup<br></br>
+
+Outputs:<br></br>
+  InstanceId:<br></br>
+    Description: "The Instance ID of the newly created EC2 instance"<br></br>
+    Value: !Ref MyEC2Instance<br></br>
+
+  InstanceType:<br></br>
+    Description: "The EC2 instance type"<br></br>
+    Value: !Ref InstanceType<br></br>
+
+  VPCId:<br></br>
+    Description: "The VPC ID of the EC2 instance"<br></br>
+    Value: !Ref VPCId<br></br>
+
+    Keep in mind for creating ec2 instrance with cft we need the following things:
+    ImageID, Keyname(Keypair), instancetype, securitygroup, vpc and subnet <br></br>
