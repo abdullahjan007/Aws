@@ -1936,7 +1936,7 @@ Outputs:<br></br>
     Description: "The EC2 instance type"<br></br> 
     Value: !Ref InstanceType<br></br> 
   
-The above yaml code is fine for default vpc but if we want to use a custom vpc we have to give vpc id and subnet id as well otherwise it gives an error.. The reason for this error is if we use custom vpc and use the vpc id in security group but our instance is created in a default vpc it gives a network mismatch error that why we have to set subnet id as well.. The code for creating ec2 instance with default vpc is as follow:<br></br>
+The above yaml code is fine for default vpc but if we want to use a custom vpc we have to give vpc id and subnet id as well otherwise it gives an error.. The reason for this error is if we use custom vpc and use the vpc id in security group but not set subnet then our instance is created in a default vpc it gives a network mismatch error that why we have to set subnet id as well.. The code for creating ec2 instance with default vpc is as follow:<br></br>
 AWSTemplateFormatVersion: "2010-09-09"<br></br>
 
 Description: "My First EC2 Instance"<br></br>
