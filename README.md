@@ -1999,3 +1999,18 @@ Outputs:<br></br>
 
     Keep in mind for creating ec2 instrance with cft we need the following things:
     ImageID, Keyname(Keypair), instancetype, securitygroup, vpc and subnet <br></br>
+
+
+# DAY 12 AWS Code Commit
+Usually we follow four steps in deployment.. <br></br>
+We first need some location where we want to host our code like github this is step 1.. <br></br>
+In step 2, when someone commits a code on a github it triggers the webhooks which further triggers the jenkins pipeline..<br></br>
+In step 3, we build the code, do the unit integration and code quality check all this <br></br>
+In step 4, The build product like dockerimage is deployed on ec2 or some server <br></br>
+
+AWS provides four different services for the above mentioned 4 steps.. <br></br>
+For Step1, aws service is AWS code commit, For Step 2, aws service is AWS codepipeline, For Step 3, aws service is AWS codebuild, For Step 4, aws service is aws deploy <br></br>
+
+Question is if there's many opensource tools like github, gitlab, github actions, jenkins, argocd, then why there's a need of aws services.. Answer is you use github and gitlab free for your personal projects but companies used their enterprise version...and some companies also used managed git like they download and install gitlab on their servers like the way we use jira here in our organization (jira.*****.com) and when you have 1000 repositories then you have to scale up your server on which git or gitlab is installed or configured... So, that's why people used aws services... When aws provide solution of something it also provide service managed solution of that thing as well (like if aws provide a service of compute, it also provides a service to manage it as well like ec2 not cnfrm)... I am not saying companies don't use github, gitlab and jenkins.. Companies use github , jenkins etc but some companies also use aws services of ci/cd.....<br></br>
+There are some advantages and disadvantages of using the aws ci/cd services..<br></br>
+Advantages: Managed git (Managed by aws itself like if number of repos increases it automatically scaled up), scalability, reliability<br></br>
