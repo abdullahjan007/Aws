@@ -2034,3 +2034,6 @@ We install agent on our ec2 instance and our ec2 instance is going to use the co
 # keep this thing in mind <br></br>
 When we grant permission to users..we create an IAM users like this user has an access of EC2 and S3 but when we grant permission to services, like EC2 service can access the CodeDeploy service then we use the IAM Roles and roles are for temporary time period 
 In code deploy, must write appspec.yaml at root level <br></br>
+# Steps for codeDeploy:
+1. create an application in aws code deploy
+2. 
