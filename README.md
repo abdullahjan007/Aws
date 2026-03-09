@@ -2033,3 +2033,4 @@ in code deploy class, we create ec2 instance and add a tag to this ec2 instance.
 We install agent on our ec2 instance and our ec2 instance is going to use the codedeploy service..in the same way codedeploy is going to use the ec2 service so we have to define a iam role for this.. We create a role of ec2 instance and set a permission of codedeploy access<br></br>
 # keep this thing in mind <br></br>
 When we grant permission to users..we create an IAM users like this user has an access of EC2 and S3 but when we grant permission to services, like EC2 service can access the CodeDeploy service then we use the IAM Roles and roles are for temporary time period 
+In code deploy, must write appspec.yaml at root level <br></br>
