@@ -2034,6 +2034,8 @@ We install agent on our ec2 instance and our ec2 instance is going to use the co
 # keep this thing in mind <br></br>
 When we grant permission to users..we create an IAM users like this user has an access of EC2 and S3 but when we grant permission to services, like EC2 service can access the CodeDeploy service then we use the IAM Roles and roles are for temporary time period 
 In code deploy, must write appspec.yaml at root level <br></br>
-# Steps for codeDeploy:
-1. create an application in aws code deploy
-2. 
+# Steps for codeDeploy:<br></br>
+1. create an application in aws code deploy<br></br>
+2. create an ec2 instance because i want to deploy my app on ec2 and ec2 acts as a host/server<br></br>
+3. Create a tag for ec2 because if there are multiple ec2 then it is difficult to identify which ec2 was created for code deploy that's why we use tag for identification<br></br>
+4. Install or setup an agent on ec2 for deployment like the we configure on azure ai-68<br></br>
