@@ -2052,3 +2052,7 @@ cloud watch ka scene simple ha ye bs montioring karta ha let suppose mainey aik 
 # BigQuery is equivalent to Amazon Redshift, Snowflake, Azure Synapse Analytics, Apache Hive <br></br>
 # Firestore / DynamoDB / MongoDB Atlas → store app data (users, messages, etc.)
 # BigQuery / Redshift / Snowflake → analyze large datasets (reports, analytics)
+
+# Day 16 (AWS Lambda function) <br></br>
+What comes in our mind when we first thought about lambda? Like in case of s3 first thing that comes in our mind is storage because s3 solves the problem of storage. In the same way when we thought of lambda first thing that comes in our mind is compute and serverless (yes, there are two main characteristics of lambda).. Lambda belongs to the family of compute. The same family that our ec2 belongs to...but lambda also have serverless characteristic what it means? like in case of ec2 we have to select the amazon machine image, cpu, memory each and everything but in case of lambda we simply say this is our python application and we want to run this on lambda compute then all the resources are manage itself we don'
+t have to set the cpu, memory, ami and other things... One more thing, lambda function/compute can tear down automatically it self..like when job is done it tear down the resources but that is not the case in ec2 we have to manually delete the instance other wise it cost us some charges.. also lambda functions can scale up and scale down its resources automatically based on the usage but that is not the case in case of ec2.<br></br>
