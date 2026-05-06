@@ -2091,3 +2091,4 @@ then we see which snapshot is attached to which volume and which volume is furth
 we then get the ec2 instance id.. in the same way we get the id of volumes and snapshots<br></br>
 then we check if snapshot isn't atatched to any volume then just delete it<br></br>
 in the same way we check if snapshot is attached to volume but that volume isn't attached to any instance then we also delete it<br></br> 
+We can also trigger this lambda function with cloudwatch.. in cloudwatch we go to event tabs..then set a rule like schedule everyday and that's it<br></br>
