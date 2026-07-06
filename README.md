@@ -2113,3 +2113,373 @@ Correct (REST Endpoint)<br></br>
 abd-bucket.s3.ap-south-1.amazonaws.com<br></br>
 When using a private bucket, CloudFront must use the REST endpoint, not the website endpoint.<br></br>
 Since you browsed the bucket from the dropdown, AWS should automatically choose the REST endpoint.<br></br>
+
+# Q: when i write index.html at Default root object i access my website tell me how this thing works? if i have multiple .html files in my bucket then how can i access.. is this approach is good? tell me overall how things works perfectly fine when i wrote index.html under Default root object:
+````markdown
+# Understanding CloudFront's Default Root Object
+
+Excellent! This confirms that your CloudFront configuration was correct all along. The only missing piece was the **Default Root Object**.
+
+Now let's understand **why** it works.
+
+---
+
+# Before Setting the Default Root Object
+
+Suppose you visit:
+
+```text
+https://d16********49au.cloudfront.net/
+```
+
+Notice that after `.net` there is **nothing**.
+
+The browser is actually requesting:
+
+```http
+GET /
+```
+
+CloudFront forwards that request to Amazon S3.
+
+S3 receives:
+
+```http
+GET /
+```
+
+Now think about your bucket.
+
+```
+Bucket
+│
+├── index.html
+├── about.html
+├── contact.html
+└── images/
+```
+
+There is **no object named** `/`.
+
+There is only:
+
+```
+index.html
+```
+
+So S3 doesn't know what object to return.
+
+With a private bucket, S3 responds with:
+
+```
+AccessDenied
+```
+
+CloudFront simply forwards that error to your browser.
+
+---
+
+# After Setting `Default Root Object = index.html`
+
+Now CloudFront behaves differently.
+
+When the browser requests:
+
+```text
+https://d16********49au.cloudfront.net/
+```
+
+CloudFront internally changes the request to:
+
+```http
+GET /index.html
+```
+
+before sending it to S3.
+
+The request flow becomes:
+
+```
+Browser
+    │
+    ▼
+GET /
+    │
+    ▼
+CloudFront
+    │
+(Rewrites Request)
+    │
+GET /index.html
+    │
+    ▼
+Private S3 Bucket
+    │
+Returns index.html
+    │
+    ▼
+CloudFront
+    │
+    ▼
+Browser
+```
+
+That is why your website now loads successfully.
+
+---
+
+# What If You Have Multiple HTML Files?
+
+Suppose your bucket contains:
+
+```
+index.html
+about.html
+contact.html
+pricing.html
+```
+
+Your **Default Root Object** remains:
+
+```
+index.html
+```
+
+Now CloudFront maps URLs like this:
+
+| URL | Object Requested from S3 |
+|------|--------------------------|
+| `/` | `index.html` |
+| `/about.html` | `about.html` |
+| `/contact.html` | `contact.html` |
+| `/pricing.html` | `pricing.html` |
+
+Examples:
+
+```
+https://d16xxxx.cloudfront.net/
+```
+
+Loads:
+
+```
+index.html
+```
+
+Whereas:
+
+```
+https://d16xxxx.cloudfront.net/about.html
+```
+
+Loads:
+
+```
+about.html
+```
+
+> **Important:** CloudFront only substitutes the **Default Root Object** when the requested path is exactly `/`.
+
+---
+
+# What About Folders?
+
+Suppose your bucket looks like this:
+
+```
+index.html
+
+blog/
+    ├── index.html
+    └── post1.html
+
+products/
+    ├── index.html
+    └── phone.html
+```
+
+Requests behave like this:
+
+| URL | Object Returned |
+|-----|-----------------|
+| `/` | `index.html` |
+| `/blog/post1.html` | `blog/post1.html` |
+| `/products/phone.html` | `products/phone.html` |
+
+### Important Note
+
+The **Default Root Object** applies **only to the root (`/`)**.
+
+It **does not automatically** make:
+
+```
+/blog/
+```
+
+serve:
+
+```
+blog/index.html
+```
+
+If you want folder URLs (like `/blog/`) to automatically load `blog/index.html`, you typically use:
+
+- CloudFront Functions
+- Lambda@Edge
+- URL rewriting
+- A different origin configuration
+
+---
+
+# Why Doesn't CloudFront Automatically Use `index.html`?
+
+Because **CloudFront is a CDN, not a web server**.
+
+A traditional web server like Apache or Nginx usually has a built-in rule:
+
+```
+If user requests /
+
+Serve index.html
+```
+
+CloudFront does **not** assume that behavior.
+
+It simply forwards requests unless you explicitly tell it otherwise.
+
+The **Default Root Object** is the setting that tells CloudFront:
+
+> "Whenever someone requests `/`, actually fetch `index.html`."
+
+---
+
+# Is This the Correct Approach?
+
+✅ Yes.
+
+For a **private S3 bucket behind CloudFront**, this is the **AWS-recommended architecture**.
+
+```
+                Browser
+                    │
+                    ▼
+          CloudFront Distribution
+                    │
+        Default Root Object = index.html
+                    │
+                    ▼
+      Private Amazon S3 Bucket
+```
+
+### Advantages
+
+- ✅ S3 bucket remains private.
+- ✅ Users cannot access S3 directly.
+- ✅ CloudFront caches content globally.
+- ✅ Faster website loading.
+- ✅ Easy to enable HTTPS.
+- ✅ Supports custom domains.
+- ✅ Supports AWS WAF.
+- ✅ Supports CloudFront Functions and Lambda@Edge.
+
+---
+
+# Complete Example
+
+Suppose your bucket contains:
+
+```
+index.html
+about.html
+contact.html
+
+css/
+    └── style.css
+
+js/
+    └── app.js
+
+images/
+    └── logo.png
+```
+
+Users can access:
+
+| URL | File Served |
+|------|-------------|
+| `/` | `index.html` |
+| `/about.html` | `about.html` |
+| `/contact.html` | `contact.html` |
+| `/css/style.css` | `css/style.css` |
+| `/js/app.js` | `js/app.js` |
+| `/images/logo.png` | `images/logo.png` |
+
+Examples:
+
+```
+https://d16xxxx.cloudfront.net/
+```
+
+➡️ Serves:
+
+```
+index.html
+```
+
+```
+https://d16xxxx.cloudfront.net/about.html
+```
+
+➡️ Serves:
+
+```
+about.html
+```
+
+```
+https://d16xxxx.cloudfront.net/css/style.css
+```
+
+➡️ Serves:
+
+```
+css/style.css
+```
+
+```
+https://d16xxxx.cloudfront.net/images/logo.png
+```
+
+➡️ Serves:
+
+```
+images/logo.png
+```
+
+---
+
+# Key Takeaways
+
+- The **Default Root Object** is only used when the URL path is `/`.
+- It tells CloudFront which file to serve for the root URL.
+- Other files are accessed directly using their full path.
+- Keeping your S3 bucket private while serving content through CloudFront is the recommended AWS architecture for static websites.
+
+---
+
+# Next Concepts to Learn
+
+Now that your CloudFront distribution is working, the next important topics are:
+
+1. **CloudFront Caching**
+   - How CloudFront caches objects at edge locations.
+
+2. **Cache Invalidation**
+   - How to force CloudFront to fetch updated files from S3.
+
+3. **TTL (Time To Live)**
+   - How cache duration affects when CloudFront refreshes content from the origin.
+
+These concepts are the natural next step after successfully configuring CloudFront with a private Amazon S3 bucket.
+````
+
