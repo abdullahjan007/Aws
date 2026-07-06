@@ -2104,3 +2104,12 @@ In short (CdN helps you cache the content in the nearest edge location . Cloud f
 # Practial implementation of Cloudfront <br></br>
 first of all we create an s3 bucket (remeber name of bucket should be your domain name like www.piyush.com but for tutorial purpose if you don't have a custom domain then example.com or anyname could be fine) always disable the public access of your s3 bucket due to security, latecy and cost issue as discussed above so how can we access the bucket? ans is thorugh cloud front.. we then go to properties set the requirements.. upload the files.. under property section we get the url but we got a 403 forbidden error.. reason is because we disable the public access to our bucket<br></br> (extra thing: under property section when we enable the static website hosting option we got two option: host a website, redirect request for an object (this option send the request to another bucket or domain) <br></br>
 We go to the cloudfront, create a distribution, at first we select the origin domain like where from data rendered, origin access should not be public due to security concerns it should be either origin access control settings(bucket can only restrict access to only cloudfront) or legacy access identites(use a cloudfront origin access identity(oai) to access the s3 bucket...In legacy access identites, we actually create a virtual identity who can access the bucket (not cnfrm).. after selecting the legacy access identites we should update the policy of s3 as well by clicking on the yes option (this updated policy is to allow access of s3 to newly create oai user) (not cnfrm)<br></br>
+# IMP This is one of the most common mistakes.<br></br>
+
+There are two different S3 endpoints.<br></br>
+Wrong (Website Endpoint)<br></br>
+abd-bucket.s3-website.ap-south-1.amazonaws.com<br></br>
+Correct (REST Endpoint)<br></br>
+abd-bucket.s3.ap-south-1.amazonaws.com<br></br>
+When using a private bucket, CloudFront must use the REST endpoint, not the website endpoint.<br></br>
+Since you browsed the bucket from the dropdown, AWS should automatically choose the REST endpoint.<br></br>
