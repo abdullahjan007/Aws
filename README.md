@@ -2524,6 +2524,7 @@ Toh docker login command ek session establish karti hai tumhare local Docker CLI
 
 phir is kay baad hum image ko tag kartey hain is command say:<br></br>
 docker tag my-flask-app:latest <account-id>.dkr.ecr.us-east-1.amazonaws.com/my-flask-app:v1<br></br>
+docker tag my-flask-app:latest (ye local image ha) is ko rename kia ha is name aur version say jo ecr pa push hoga <account-id>.dkr.ecr.us-east-1.amazonaws.com/my-flask-app:v1<br></br>
 
 aur phir at the end image push kr detay hain<br></br>
 docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/my-flask-app:v1<br></br>
