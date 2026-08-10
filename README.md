@@ -2536,6 +2536,9 @@ aik imp cheez image ko tag karna zaroori ha.. ager tag nhi karo gay tou  error a
 
 aik imp cheez aur.. starting ma jb ma repo create kr rha tha via cli tou authentication failed a rha tha kyu kay mujhe permission nhi thi.. mainey sirf iam role pa ja kay AmazonEC2ContainerRegisteryFullAccess ki permission add kr di tou kaam chal para<br></br>
 
+aik abhi ma practical kru ga delete untagged images with 3 days ka.. ager image tag kiye beghair hum ecr pa push nhi kr saktey tou untagged images tou honi hi nhi chahiye.. phir ye kyu hain? reason is jb same image ko dobara build kar kay push kartey hain with same tag like latest ya v1 tou tag purani image say remove ho kay latest pushed image pa a jata ha aur purani image ko untagged kr deta ha<br></br>
+aur aik dafa repo create kr di aur aws ecr get-info-password | docker login --username "AWD" --password-stdin .............wala kaam kr diya tou ok ha baar baar nhi karna.. next time sirf image build karni ha.. tag karna ha us ko aur simply push karna ha<br></br>
+
 # Interview Question Regarding ECR: <br></br>
 Q1: Your CI/CD pipeline pushes to ECR successfully, but an ECS task in another environment fails to pull the image. Walk through your debugging steps.<br></br>
 
