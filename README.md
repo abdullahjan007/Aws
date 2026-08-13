@@ -2563,3 +2563,155 @@ Token expires, requiring re-authentication. In CI/CD, aws ecr get-login-password
 Q6: Why use ECR over DockerHub if you're already on AWS?<br></br>
 
 No extra networking layer needed — private subnet workloads can pull via VPC endpoint, avoiding NAT Gateway costs. No separate credentials to manage — IAM roles handle push/pull auth. Every action is logged in CloudTrail for audit purposes.<br></br>
+
+# ECS (Elastic Container Service)
+# AWS ECS (Elastic Container Service) — Study Notes
+
+> Personal DevOps interview prep notes. Part of a daily AWS/DevOps topic series. Continues from ECR notes.
+
+---
+
+## 1. What is ECS?
+
+ECR is just **storage** for Docker images. ECS is the service that **actually runs** those images — deploying, managing, scaling, and auto-healing containers.
+
+**Analogy:** ECR is a warehouse holding packaged products (images). ECS is the operations manager deciding when to put a product on the shelf (deploy), how many copies are needed (scaling), and replacing it immediately if something goes wrong (auto-healing) — without manual intervention.
+
+> ECS itself is not a compute engine — it's an orchestration service. It manages container lifecycle, scheduling, and scaling, while the actual compute (EC2 or Fargate) provides the underlying infrastructure.
+
+---
+
+## 2. Core Building Blocks
+
+| Concept | What it is | Analogy |
+|---|---|---|
+| **Task Definition** | Blueprint (JSON) defining image, CPU/memory, ports, env vars, IAM role, logging | A recipe card |
+| **Task** | A running instance of a Task Definition | The dish made from the recipe |
+| **Service** | Keeps a specified number of Tasks running; auto-replaces crashed tasks | Restaurant manager ensuring enough waiters are always on the floor |
+| **Cluster** | Logical grouping/resource pool where Tasks/Services run | The restaurant building itself |
+
+---
+
+## 3. Fargate vs EC2 Launch Type
+
+| Factor | Fargate | EC2 Launch Type |
+|---|---|---|
+| Server management | AWS manages everything — no EC2 instances to maintain | You manage EC2 instances (patching, scaling, capacity) |
+| Pricing | Pay per task (CPU/memory actually used) | Pay for EC2 instance, running or not |
+| Control | Less — AWS abstracts infrastructure | More — instance type, OS-level access, custom AMIs |
+| Startup time | Slightly slower (provisioning per task) | Faster with warm/already-running capacity |
+| Best for | Variable/unpredictable workloads, small teams, low ops overhead | Steady, predictable high-volume workloads; cost optimization via Reserved/Spot instances |
+| GPU support | ❌ Not supported | ✅ Supported (GPU instance types like g4dn, g5) |
+
+**Decision rule:**
+- **Fargate** → "I don't want to manage infrastructure, just run my app."
+- **EC2 launch type** → "I need full server control and want to optimize cost with Reserved/Spot instances, or I need GPU."
+
+---
+
+## 4. What is Fargate? (Plain Explanation)
+
+Fargate is AWS's **serverless compute engine for containers** — you define the resources your container needs (CPU/memory), and AWS provisions and manages the underlying infrastructure automatically. No EC2 instance to see, patch, or manage.
+
+**EC2 launch type flow:**
+```
+You launch EC2 instance → ECS Agent installed on it → Container runs inside that instance →
+You manage OS, patching, capacity
+```
+
+**Fargate flow:**
+```
+You submit a Task Definition (CPU/memory specified) → AWS provisions infrastructure behind the scenes →
+Container runs → You never see "which machine" it ran on
+```
+
+**Pricing difference:**
+- EC2: pay for the instance regardless of utilization
+- Fargate: pay only for actual task run time (CPU/memory × duration)
+
+---
+
+## 5. Lambda vs Fargate — Both "Serverless", Different Purpose
+
+| Scenario | Lambda | Fargate |
+|---|---|---|
+| Image upload triggers thumbnail generation | ✅ | ❌ |
+| Web app that must always be available for requests | ❌ | ✅ |
+| Scheduled cleanup job (~5 min) | ✅ | ❌ |
+| Video processing task running 30+ minutes | ❌ (15 min max) | ✅ |
+| Microservice with persistent DB connection | ❌ | ✅ |
+| Low-traffic API (few calls/day) | ✅ (cost-effective) | ❌ (pay for idle) |
+| High, consistent traffic API | ❌ (cold starts) | ✅ (always warm) |
+
+**Key distinction:**
+- **Lambda** = short-lived, event-triggered functions. Starts, does one job, stops. Max 15-minute execution. Stateless.
+- **Fargate** = long-running containerized applications that stay "always on" to handle continuous traffic — a full service, not a single function.
+
+**Pricing model difference:**
+- Lambda: per-invocation + execution time (millisecond precision)
+- Fargate: per-second, for as long as the task is running (idle or active)
+
+---
+
+## 6. Real-World Scenario: Deploying a Real-Time Voice Agent (LiveKit + ElevenLabs)
+
+Applies ECS decision-making to an actual project — a voice AI agent using LiveKit (WebRTC) and ElevenLabs (TTS).
+
+### Key insight: this isn't one compute decision — it's two components with different needs
+
+**Component 1 — Agent Worker** (the actual logic connecting to LiveKit, calling STT/LLM/ElevenLabs APIs)
+- Behaves like a normal long-running process — outbound connections only, no special networking
+- **→ Fargate is a clean fit**
+
+**Component 2 — LiveKit Server (SFU)** — only relevant if self-hosting instead of using LiveKit Cloud
+- Requires a **wide UDP port range** (e.g. 50000–60000) open for WebRTC media traffic
+- Needs Redis (ElastiCache) for shared room state across replicas, and a TURN server for NAT traversal
+
+### Why Fargate *can* work for self-hosted LiveKit
+
+Fargate always uses `awsvpc` networking mode — **every task gets its own dedicated ENI and IP**. This means a wide UDP port range can be assigned per task without the port-conflict issues that come with EC2's shared-host bridge networking.
+
+### But cost matters at scale
+
+Beyond a high call volume (tens of thousands of calls/month), EC2 launch type becomes more cost-efficient per call than Fargate's pay-per-task-second billing — a common reason production teams migrate self-hosted media infrastructure from Fargate to EC2 as they scale.
+
+### GPU consideration
+
+If using external APIs (ElevenLabs, hosted LLMs) → no GPU needed, Fargate works fine.
+If self-hosting AI models (e.g. local Whisper for STT) → **GPU required → Fargate does NOT support GPU → must use EC2 launch type**.
+
+### Practical deployment architecture (self-hosted LiveKit on ECS)
+
+```
+Internet → NLB (UDP media, since ALB doesn't support UDP) → LiveKit Server Tasks (Fargate, 2+ replicas)
+                                     ↕
+                              Redis (ElastiCache — shared room state)
+                                     ↕
+                        Agent Worker Tasks (Fargate, auto-scaling)
+                                     ↓
+                    ElevenLabs API / LLM API (external calls)
+```
+
+**Components needed as separate ECS Services:**
+1. LiveKit SFU Server — Fargate, wide UDP range open, behind NLB
+2. Redis — managed via ElastiCache (not ECS)
+3. TURN server — for NAT traversal
+4. Agent Worker — Fargate, no public IP needed (outbound only), auto-scales
+
+**Scaling consideration:** CPU-based auto-scaling alone isn't enough for voice agent workers — should also scale on memory and on a custom metric like "pending dispatch job count" from the LiveKit server, since that signal catches queue build-up before latency degrades.
+
+**Practical takeaway:** Start with LiveKit Cloud (managed) + a simple Fargate-deployed agent worker. Move to self-hosted LiveKit on ECS only once scale/cost justifies the added complexity — this mirrors how real production teams evolve their architecture.
+
+---
+
+## Key Takeaways
+
+- ECS ≠ compute engine — it's the orchestrator; Fargate/EC2 are the compute options underneath it
+- Fargate = no server management, pay-per-task; EC2 launch type = full control, better cost at steady high scale
+- Fargate has no GPU support — GPU workloads require EC2 launch type
+- Lambda and Fargate are both "serverless" but solve different problems: short event-driven tasks vs long-running always-on services
+- Real-time media (WebRTC/UDP) can run on Fargate thanks to `awsvpc` mode giving each task its own ENI — but EC2 often wins on cost at high scale
+
+---
+
+*Next: ECS hands-on practical — deploying `newflaskapp:v1` from ECR as a Fargate task*
