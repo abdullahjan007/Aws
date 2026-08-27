@@ -2778,3 +2778,6 @@ Poora flow ek nazar mein<br></br>
 5. Service/Task → Actual running container<br></br>
 
 Simple line yaad rakho: "ECS orchestrator hai jo decide karta hai kya aur kaise chalana hai. Fargate aur EC2 launch type sirf ye batate hain 'kis machine pe' — ye alag services nahi, ECS ke andar ek configuration choice hai."<br></br>
+
+# permission boundary while creating a Role<br></br>
+permission boundary aik concept ha like while creating a role or permissions ma permission add karta hu kay ec2fullaccess but is ma say koi aik 2 cheezein aisi hoti hain jis ki permission ma nhi dena chahta.. us ko phir ma permission boundary ma add kr deta hu (not cnfrm)<br></br>
