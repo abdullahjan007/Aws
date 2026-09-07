@@ -2781,3 +2781,22 @@ Simple line yaad rakho: "ECS orchestrator hai jo decide karta hai kya aur kaise 
 
 # permission boundary while creating a Role<br></br>
 permission boundary aik concept ha like while creating a role or permissions ma permission add karta hu kay ec2fullaccess but is ma say koi aik 2 cheezein aisi hoti hain jis ki permission ma nhi dena chahta.. us ko phir ma permission boundary ma add kr deta hu (not cnfrm)<br></br>
+
+# ECS IMPLEMENTATION STEPS:<br></br>
+# 📋 Outline — Jo Steps Humne CLI Se Kiye (ECR → ECS Fargate Deploy)<br></br>
+Docker image build karna local machine pe (docker build)<br></br>
+ECR repository banana (aws ecr create-repository)<br></br>
+Docker ko ECR se authenticate karna (aws ecr get-login-password | docker login)<br></br>
+Image ko tag karna ECR URL ke sath (docker tag)<br></br>
+Image push karna ECR pe (docker push)<br></br>
+ECS Cluster banana (aws ecs create-cluster)<br></br>
+CloudWatch Log Group banana (logs ke liye) (aws logs create-log-group)<br></br>
+IAM Execution Role banana/verify karna (ecsTaskExecutionRole — ECR pull + logging permissions ke liye)<br></br>
+Task Definition likhna (JSON file — image URL, CPU/memory, ports, role ARN, log config)<br></br>
+Task Definition register karna (aws ecs register-task-definition)<br></br>
+Subnet aur Security Group IDs nikalna VPC se<br></br>
+Security Group mein port allow karna (jis port pe app chal rahi hai)<br></br>
+Task run karna Fargate launch type ke sath (aws ecs run-task)<br></br>
+Task status check karna (PROVISIONING → PENDING → RUNNING)<br></br>
+Network Interface se Public IP nikalna<br></br>
+Browser mein test karna app ka URL<br></br>
