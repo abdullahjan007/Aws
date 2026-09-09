@@ -2800,3 +2800,5 @@ Task run karna Fargate launch type ke sath (aws ecs run-task)<br></br>
 Task status check karna (PROVISIONING → PENDING → RUNNING)<br></br>
 Network Interface se Public IP nikalna<br></br>
 Browser mein test karna app ka URL<br></br>
+
+# aik imp point ecs may container ko Task boltey hain aur Task definition ko docker run wali command for my understanding<br></br>
