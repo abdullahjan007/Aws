@@ -2802,3 +2802,6 @@ Network Interface se Public IP nikalna<br></br>
 Browser mein test karna app ka URL<br></br>
 
 # aik imp point ecs may container ko Task boltey hain aur Task definition ko docker run wali command for my understanding<br></br>
+
+# ecs from abhishake video<br></br>
+coe stands for container orchestration environments (ECS and EKS are coe)... ager docker tha phir ecs ya eks ki zaroorat kyu ayi.. main reason is auto healing and auto scaling..docker may ye kaam khud say nhi hota.. let suppose ma kehta hu kaay ma monitoring kr rha tha jaisey hi container crash hua mainey new container up kr diya manually down time is may aye ga kyu kay pehle container ka ip change tha aur ab change hogaya user ko accessable nhi hoga ye new container eks kay case may service is issue ko resolve kr deti ha<br></br>
