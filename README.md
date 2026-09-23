@@ -2805,6 +2805,8 @@ Browser mein test karna app ka URL<br></br>
 
 # ecs from abhishake video<br></br>
 coe stands for container orchestration environments (ECS and EKS are coe)... ager docker tha phir ecs ya eks ki zaroorat kyu ayi.. main reason is auto healing and auto scaling..docker may ye kaam khud say nhi hota.. let suppose ma kehta hu kaay ma monitoring kr rha tha jaisey hi container crash hua mainey new container up kr diya manually down time is may aye ga kyu kay pehle container ka ip change tha aur ab change hogaya user ko accessable nhi hoga ye new container eks kay case may service is issue ko resolve kr deti ha<br></br>
+
+ecs aur eks may difference ye ha kay ecs simple ha (fargate kay through aws saab kuch khud hi manage kr leta ha) but eks mushkil ha.. kaal ko ager infra shift karna ho kisi dusrey cloud pay tou hum nhi kr saktey kyu kay ecs sirf aws ki properiaty ha but eks kay case may hum kr saktey hain..eks ki boht strong community ha.. kubernetes may custom resource definition hoti ha (crd) jo kubernetes ki capabilities ko aur strong kr deti ha.. like istio, service mesh, argo cd, flux cd ye saab kuberenetes kay controllers hain aur ye saab ecs may nhi hotey <br></br>
 # ***********************************************
 # some imp points <br></br>
 kuch bhi cli kay through karna ha aws pay tou saab say pehle aws cli configure karna parey ga.. ab dekhna ha ager kay aws cli configure ha ya nhi tou us kay liye ye command hoti ha [aws sts get-caller-identity] is command ko run karney kay baad ager json a gaya tou it means aws cli configure ha ager kuch bhi nhi ata tou phir configure karna parey ga using this command [aws configure] <br></br>
