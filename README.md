@@ -2805,3 +2805,42 @@ Browser mein test karna app ka URL<br></br>
 
 # ecs from abhishake video<br></br>
 coe stands for container orchestration environments (ECS and EKS are coe)... ager docker tha phir ecs ya eks ki zaroorat kyu ayi.. main reason is auto healing and auto scaling..docker may ye kaam khud say nhi hota.. let suppose ma kehta hu kaay ma monitoring kr rha tha jaisey hi container crash hua mainey new container up kr diya manually down time is may aye ga kyu kay pehle container ka ip change tha aur ab change hogaya user ko accessable nhi hoga ye new container eks kay case may service is issue ko resolve kr deti ha<br></br>
+
+kuch bhi cli kay through karna ha aws pay tou saab say pehle aws cli configure karna parey ga.. ab dekhna ha ager kay aws cli configure ha ya nhi tou us kay liye ye command hoti ha [aws sts get-caller-identity] is command ko run karney kay baad ager json a gaya tou it means aws cli configure ha ager kuch bhi nhi ata tou phir configure karna parey ga using this command [aws configure] <br></br>
+
+permissions deni hoti ha ager permissions na ho tou khud custom create kr kay attach karni hoti hain.. is kay liye root user ki zaroorat hoti ha.. ager tou ap root user ho tou ok ha but mostly cli pay root user nhi hota.. ap ko console pay hi ja kay root user kay through policies create kr kay attach karni parti hain... ab question is kay cli pay root user usually kyu nhi hota..?answer is <br></br>
+AWS ki strong recommendation hai ke root credentials CLI mein kabhi use na karo — chalo samjhata hoon kyun, aur behtar tareeka batata hoon. <br></br>
+
+Kyun Root CLI Mein Use Karna Risky Hai <br></br>
+
+Root account ka matlab hai — unlimited, unrestricted access poore AWS account pe, koi permission boundary nahi. Agar root ki Access Key/Secret Key kahin leak ho jaye (accidentally GitHub pe push ho jaye, ya laptop compromise ho jaye), poora AWS account khatam ho sakta hai — sab resources delete, sab billing tumhare zimme, koi undo nahi. <br></br>
+
+Isliye AWS best practice ye hai: Root account sirf Console mein, sirf kabhi kabhi (jaise billing changes, account-level settings) use karo — CLI mein kabhi root Access Keys generate/use mat karo. <br></br>
+
+Ye interview mein bhi pucha jata hai: "Why is it a security risk to use root credentials for daily operations?" — tumhara answer yahi hoga jo maine upar bataya. <br></br>
+
+Behtar Tareeka — Root Sirf Console Ke Liye Use Karo (One-Time Task) <br></br>
+
+Tumhe root credentials CLI mein daalne ki zaroorat hi nahi — ye kaam sirf Console se ho sakta hai: <br></br>
+
+Step-by-Step<br></br>
+Root account se AWS Console mein login karo (browser mein — jaisa tum normally karte ho jab roles banate ho) <br></br>
+IAM → Policies → Create policy <br></br>
+JSON tab select karo, wahi policy JSON paste karo jo maine pehle diya tha <br></br>
+Naam do: EksctlUserPolicy → Create policy <br></br>
+IAM → Users → AbdJan → Add permissions → Attach policies directly <br></br>
+EksctlUserPolicy search karke attach karo <br></br>
+
+Bas itna hi — root sirf Console mein, ek baar, policy banane ke liye use hua. Iske baad CLI mein hamesha AbdJan (IAM user) ke credentials hi use honge — jo already configured hain tumhare aws configure mein. <br></br>
+
+Simple Rule Yaad Rakho (Interview-Ready) <br></br>
+
+"Root account should only be used for account-level tasks that absolutely require it (like closing the account or changing billing settings) — and always through the Console, never via CLI or programmatic access keys. Day-to-day operations should always go through an IAM user or role with least-privilege permissions." <br></br>
+
+Toh: Console mein root se login karo, policy bana lo Console se hi, phir wahi policy apne AbdJan user ko attach kar do (bhi Console se, ek hi jagah pe ho jayega ye sab). CLI mein kuch change nahi karna — wahan AbdJan ka hi login rahega jo already set hai. <br></br>
+
+
+# EKS <br></br>
+EKS ko khud apna Cluster Role aur Node Role chahiye hota hai (kyu chahiye hota ha reason is auto scaling wagera.. ye saab kuch eks backend pay khud kr rha hota ha is liye (not cnfrm) is cheez ko gpt say aik dafa dobara poch lena kay usey ye saab kyu chahiye hota ha), jo eksctl automatically create karta hai tumhari taraf se — isliye tumhare User ko role-creation ki permission chahiye <br></br>
+eksctl internally CloudFormation stacks use karta hai cluster infrastructure banane ke liye <br></br>
+eksctl aik command line tool ha jaisey kubectl ha.. is liye eks karney say pehle ye 2 pre-reqs hain.. kubectl aur eksctl install hona zaroori ha<br></br>
