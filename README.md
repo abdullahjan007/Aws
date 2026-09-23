@@ -2805,7 +2805,8 @@ Browser mein test karna app ka URL<br></br>
 
 # ecs from abhishake video<br></br>
 coe stands for container orchestration environments (ECS and EKS are coe)... ager docker tha phir ecs ya eks ki zaroorat kyu ayi.. main reason is auto healing and auto scaling..docker may ye kaam khud say nhi hota.. let suppose ma kehta hu kaay ma monitoring kr rha tha jaisey hi container crash hua mainey new container up kr diya manually down time is may aye ga kyu kay pehle container ka ip change tha aur ab change hogaya user ko accessable nhi hoga ye new container eks kay case may service is issue ko resolve kr deti ha<br></br>
-
+# ***********************************************
+# some imp points <br></br>
 kuch bhi cli kay through karna ha aws pay tou saab say pehle aws cli configure karna parey ga.. ab dekhna ha ager kay aws cli configure ha ya nhi tou us kay liye ye command hoti ha [aws sts get-caller-identity] is command ko run karney kay baad ager json a gaya tou it means aws cli configure ha ager kuch bhi nhi ata tou phir configure karna parey ga using this command [aws configure] <br></br>
 
 permissions deni hoti ha ager permissions na ho tou khud custom create kr kay attach karni hoti hain.. is kay liye root user ki zaroorat hoti ha.. ager tou ap root user ho tou ok ha but mostly cli pay root user nhi hota.. ap ko console pay hi ja kay root user kay through policies create kr kay attach karni parti hain... ab question is kay cli pay root user usually kyu nhi hota..?answer is <br></br>
