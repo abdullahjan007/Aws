@@ -2791,7 +2791,7 @@ Image ko tag karna ECR URL ke sath (docker tag)<br></br>
 Image push karna ECR pe (docker push)<br></br>
 ECS Cluster banana (aws ecs create-cluster)<br></br>
 CloudWatch Log Group banana (logs ke liye) (aws logs create-log-group)<br></br>
-IAM Execution Role banana/verify karna (ecsTaskExecutionRole — ECR pull + logging permissions ke liye)<br></br>
+IAM Execution Role banana/verify karna (ecsTaskExecutionRole — ECR pull + logging permissions ke liye [UI say jb kro tou dropdown menu ata ha is option pay us ko jb create new role wala option select kr lo tou wo automatically roles create kr deta ha (not cnfrm)] )<br></br>
 Task Definition likhna (JSON file — image URL, CPU/memory, ports, role ARN, log config)<br></br>
 Task Definition register karna (aws ecs register-task-definition)<br></br>
 Subnet aur Security Group IDs nikalna VPC se<br></br>
