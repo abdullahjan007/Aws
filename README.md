@@ -2842,6 +2842,7 @@ Simple Rule Yaad Rakho (Interview-Ready) <br></br>
 
 Toh: Console mein root se login karo, policy bana lo Console se hi, phir wahi policy apne AbdJan user ko attach kar do (bhi Console se, ek hi jagah pe ho jayega ye sab). CLI mein kuch change nahi karna — wahan AbdJan ka hi login rahega jo already set hai. <br></br>
 
+ECS kay case may bhi role mainey UI say hi ja kay bnaya tha <br></br> 
 
 # EKS <br></br>
 EKS ko khud apna Cluster Role aur Node Role chahiye hota hai (kyu chahiye hota ha reason is auto scaling wagera.. ye saab kuch eks backend pay khud kr rha hota ha is liye (not cnfrm) is cheez ko gpt say aik dafa dobara poch lena kay usey ye saab kyu chahiye hota ha), jo eksctl automatically create karta hai tumhari taraf se — isliye tumhare User ko role-creation ki permission chahiye <br></br>
