@@ -2848,3 +2848,370 @@ ECS kay case may bhi role mainey UI say hi ja kay bnaya tha <br></br>
 EKS ko khud apna Cluster Role aur Node Role chahiye hota hai (kyu chahiye hota ha reason is auto scaling wagera.. ye saab kuch eks backend pay khud kr rha hota ha is liye (not cnfrm) is cheez ko gpt say aik dafa dobara poch lena kay usey ye saab kyu chahiye hota ha), jo eksctl automatically create karta hai tumhari taraf se — isliye tumhare User ko role-creation ki permission chahiye <br></br>
 eksctl internally CloudFormation stacks use karta hai cluster infrastructure banane ke liye <br></br>
 eksctl aik command line tool ha jaisey kubectl ha.. is liye eks karney say pehle ye 2 pre-reqs hain.. kubectl aur eksctl install hona zaroori ha<br></br>
+
+# HOW to connect Youtube using Windows AMI: <br></br>
+# Windows EC2 on AWS: Launch, Connect via RDP, and Fix "Can't Connect" (0x904) with Fleet Manager
+
+A complete runbook, from launching a Windows Server EC2 instance to connecting to it. It documents the RDP problem I hit, how I diagnosed it, and the fix that worked (AWS Systems Manager Fleet Manager).
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Step 1: Launch the Windows EC2 Instance](#step-1-launch-the-windows-ec2-instance)
+3. [Step 2: Security Group Rules (Inbound and Outbound)](#step-2-security-group-rules-inbound-and-outbound)
+4. [Step 3: Network ACL (Check Only)](#step-3-network-acl-check-only)
+5. [Step 4: Get the Windows Administrator Password](#step-4-get-the-windows-administrator-password)
+6. [Step 5: Connect with Remote Desktop (RDP)](#step-5-connect-with-remote-desktop-rdp)
+7. [The Problem I Faced](#the-problem-i-faced)
+8. [How I Diagnosed It](#how-i-diagnosed-it)
+9. [Root Cause](#root-cause)
+10. [The Solution: Fleet Manager](#the-solution-fleet-manager)
+11. [How Fleet Manager Works](#how-fleet-manager-works)
+12. [Fleet Manager Setup, Step by Step](#fleet-manager-setup-step-by-step)
+13. [Troubleshooting Cheat Sheet](#troubleshooting-cheat-sheet)
+14. [Security Best Practices](#security-best-practices)
+15. [Cleanup and Cost Control](#cleanup-and-cost-control)
+16. [Key Takeaways](#key-takeaways)
+
+---
+
+## Overview
+
+| Item | Value used |
+|---|---|
+| OS / AMI | Microsoft Windows Server 2025 |
+| Instance type | `c7i-flex.large` |
+| Storage | 30 GiB EBS (gp3) |
+| Region | us-east-1 (N. Virginia) |
+| VPC | Default VPC |
+| Login method | RSA key pair (`.pem`) to decrypt the Administrator password |
+| Client network | Office network (private range `172.16.x.x`) |
+
+Linux vs Windows, the main difference:
+
+| | Ubuntu / Linux | Windows |
+|---|---|---|
+| Remote access protocol | SSH | RDP |
+| Port | **22** | **3389** |
+| Login | `.pem` key directly | `.pem` key is used to **decrypt** the Administrator password |
+
+---
+
+## Step 1: Launch the Windows EC2 Instance
+
+**EC2 → Instances → Launch instances**
+
+| Setting | Value |
+|---|---|
+| **Name** | anything (e.g. `utube`) |
+| **AMI** | *Microsoft Windows Server 2025 Base* (Quick Start, Windows tab) |
+| **Instance type** | `c7i-flex.large` (or any 2 vCPU / 4 GB+ type; avoid `t2.micro`/`t3.micro` for Windows because it is very slow) |
+| **Key pair** | Create new key pair → **Type: RSA**, **Format: `.pem`** → download and store it safely |
+| **VPC / Subnet** | Default VPC, a **public** subnet |
+| **Auto-assign public IP** | **Enable** |
+| **Security group** | Create new (see Step 2) |
+| **Storage** | 30 GiB gp3 (default) |
+
+> **Key pair notes**
+> - You **must** select a key pair. Without one, the Windows password cannot be decrypted.
+> - Use **RSA**. Windows password decryption does not work with ED25519 keys.
+> - AWS lets you download the `.pem` **only once**. Never commit it to Git (`*.pem` in `.gitignore`).
+
+Click **Launch instance**, then wait until **Status checks show 2/2 passed**. Windows takes longer to boot than Linux (about 5 to 10 minutes).
+
+---
+
+## Step 2: Security Group Rules (Inbound and Outbound)
+
+A security group is a **stateful** virtual firewall attached to the instance. If inbound traffic is allowed, the reply traffic is automatically allowed out.
+
+### Inbound rules
+
+| Type | Protocol | Port | Source | Purpose |
+|---|---|---|---|---|
+| **RDP** | TCP | **3389** | **My IP** (recommended) | Remote Desktop access |
+| HTTP | TCP | 80 | `0.0.0.0/0` | *Only if hosting a website* |
+| HTTPS | TCP | 443 | `0.0.0.0/0` | *Only if hosting a website* |
+
+- **Required:** RDP TCP 3389.
+- Choose **My IP** as the source, not `0.0.0.0/0`. Open-to-world RDP gets brute-forced quickly.
+- If your public IP changes (mobile data, dynamic ISP, different network), update the rule.
+- HTTP/HTTPS are not needed for RDP. Add them only for web hosting.
+- For temporary testing only, `0.0.0.0/0` on 3389 is acceptable. Tighten it afterwards.
+
+### Outbound rules
+
+| Type | Protocol | Port | Destination |
+|---|---|---|---|
+| All traffic | All | All | `0.0.0.0/0` |
+
+- This is the **default**. Leave it as is.
+- It matters for Fleet Manager: the SSM Agent needs **outbound HTTPS (443)** to reach AWS. If you restrict outbound rules, keep 443 open.
+
+---
+
+## Step 3: Network ACL (Check Only)
+
+The default VPC uses a default Network ACL that allows everything. NACLs are **stateless**, so both directions must be allowed. Normally you do not need to change anything.
+
+| Direction | Rule | Type | Port | Source/Dest | Action |
+|---|---|---|---|---|---|
+| Inbound | 100 | All traffic | All | `0.0.0.0/0` | Allow |
+| Outbound | 100 | All traffic | All | `0.0.0.0/0` | Allow |
+
+If you ever use a custom NACL, make sure of:
+
+- Inbound TCP 3389 is allowed.
+- Outbound TCP **1024-65535** (ephemeral ports) is allowed for the return traffic.
+- Rules are evaluated in number order (lowest first). A lower-numbered Allow wins over a later Deny.
+
+Also confirm the subnet's **route table** has `0.0.0.0/0 → igw-xxxxxxxx` (Internet Gateway). The default VPC has this.
+
+---
+
+## Step 4: Get the Windows Administrator Password
+
+Windows does not use the `.pem` to log in directly. The password is generated by AWS and encrypted with your key pair's public key. You decrypt it with the private key (the `.pem`).
+
+1. **EC2 → Instances** → select the instance → **Connect**.
+2. Open the **RDP client** tab.
+3. Click **Get password**.
+4. **Upload private key file** and choose your `.pem` (or paste its contents).
+5. Click **Decrypt password**.
+6. Copy the values:
+   - **Username:** `Administrator`
+   - **Password:** the decrypted string
+
+Notes:
+
+- The password is not available for the first ~4 to 10 minutes after launch. If the console says it is not ready, wait and retry.
+- If you launched **without a key pair**, the password cannot be decrypted. Relaunch with a key pair.
+- Use the username `Administrator`, **not** your local PC username.
+- Paste the password instead of typing it (long, with look-alike characters).
+
+---
+
+## Step 5: Connect with Remote Desktop (RDP)
+
+1. On your PC press the Windows key and open **Remote Desktop Connection** (`mstsc`).
+2. In **Computer**, enter the instance's **public IPv4 address** (or public DNS).
+3. Click **Connect**.
+4. When prompted, choose **More choices → Use a different account**.
+5. Username: `Administrator`, Password: the decrypted password.
+6. Accept the certificate warning (**Yes**). This is normal for a fresh instance.
+
+> The public IP changes when you stop/start the instance unless you attach an **Elastic IP**. Always re-check the IP before reconnecting.
+
+---
+
+## The Problem I Faced
+
+Everything above was configured correctly, but RDP still failed:
+
+```
+This computer can't connect to the remote computer.
+Try connecting again. If the problem continues, contact the owner of
+the remote computer or your network administrator.
+
+Error code: 0x904
+Extended error code: 0x7
+```
+
+---
+
+## How I Diagnosed It
+
+### 1. Checked AWS-side configuration (all correct)
+
+| Check | Result |
+|---|---|
+| Instance state | Running, public IPv4 assigned |
+| Security group inbound | RDP TCP 3389 allowed |
+| Network ACL inbound / outbound | Allow all |
+| Instance size | Large enough |
+| Age of instance | ~20 minutes, so not "still booting" |
+
+### 2. Tested the port from my PC
+
+```powershell
+Test-NetConnection <public-ip> -Port 3389
+```
+
+Result: `TcpTestSucceeded : True`
+
+> **Gotcha:** this only proves the TCP handshake completes. It does **not** prove that a full RDP session will work. A firewall or proxy can accept the connection and drop the RDP traffic afterwards.
+
+### 3. Read the error carefully
+
+`0x904` appeared **before** the login prompt. That means it is a **network-level failure**, not a wrong password or a Windows problem.
+
+---
+
+## Root Cause
+
+My PC was on an **office network** (`172.16.x.x`). The office firewall allowed the TCP handshake on 3389 but interfered with the actual RDP session, so RDP failed with `0x904`.
+
+Ways to confirm this (any one):
+
+- Connect via a **phone hotspot** and retry. If it works there, the office network is the cause.
+- Try from another network or a VPN.
+
+---
+
+## The Solution: Fleet Manager
+
+**AWS Systems Manager → Fleet Manager** gives a Remote Desktop session **inside the browser** through the AWS Console. It uses **outbound HTTPS (443)** only, so port 3389 and the office firewall are not involved.
+
+Requirements:
+
+1. **SSM Agent** on the instance (preinstalled on Windows Server AMIs).
+2. An **IAM role** with the `AmazonSSMManagedInstanceCore` policy attached to the instance.
+3. Outbound HTTPS (443) access from the instance (the default outbound rule already allows it).
+
+---
+
+## How Fleet Manager Works
+
+**Normal RDP** (inbound to the instance, can be blocked):
+
+```
+My PC ──── port 3389 ────► Internet ────► EC2 Instance
+        (office firewall may drop this)
+```
+
+**Fleet Manager** (the instance calls out to AWS):
+
+```
+EC2 Instance ── outbound HTTPS 443 ──► AWS Systems Manager
+                                              ▲
+                                              │ HTTPS 443
+                                        My Browser (AWS Console)
+```
+
+1. The SSM Agent inside Windows starts and looks for permissions.
+2. The **IAM role** gives the instance permission to talk to Systems Manager.
+3. The agent connects **out** to AWS and registers itself as a **managed node**.
+4. When I click Connect in the console, AWS sends my session through that existing connection.
+
+> **Fleet** = a group of servers/instances managed together. **Fleet Manager** = the console to manage that group.
+> `AmazonSSMManagedInstanceCore` is an AWS **managed policy** (not a role). It is attached **to** a role.
+
+---
+
+## Fleet Manager Setup, Step by Step
+
+> Use the same Region as the instance (us-east-1).
+
+### Part 1: Create the IAM role
+
+1. **IAM → Roles → Create role**.
+2. Trusted entity type: **AWS service**. Use case: **EC2**. Click **Next**.
+3. Search `AmazonSSMManagedInstanceCore` and tick it. Click **Next**.
+4. Role name: e.g. `EC2-SSM-Role` (any name works). Click **Create role**.
+
+### Part 2: Attach the role to the instance
+
+1. **EC2 → Instances** → select the instance.
+2. **Actions → Security → Modify IAM role**.
+3. Select the role and click **Update IAM role**.
+4. Verify: **Security** tab shows the IAM role name.
+
+### Part 3: Wait for registration
+
+1. Wait **5 to 10 minutes**.
+2. **Systems Manager → Fleet Manager**, then click the **refresh** icon.
+3. The instance should show under **Managed nodes** with **Ping status: Online**.
+
+If it does not appear:
+
+- Confirm the role is attached (Part 2, step 4) and contains the `AmazonSSMManagedInstanceCore` policy.
+- Confirm you are in the correct Region.
+- **Reboot** the instance (**Instance state → Reboot instance**), then check again after ~5 minutes.
+- Optional: use **Configure Default Host Management** (banner in Fleet Manager). It lets Systems Manager manage EC2 instances without an instance profile.
+
+### Part 4: Connect
+
+1. In Fleet Manager, tick the instance.
+2. **Node actions → Connect → Connect with Remote Desktop**.
+3. Authentication type: **Key pair**.
+4. Paste the entire contents of the `.pem` file (from `-----BEGIN RSA PRIVATE KEY-----` to `-----END RSA PRIVATE KEY-----`) or use **Browse**.
+5. Click **Connect**. The Windows desktop opens in the browser.
+
+**Alternative:** choose *Username and password*, then use `Administrator` plus the password decrypted in Step 4.
+
+---
+
+## Troubleshooting Cheat Sheet
+
+| Symptom | Likely cause | What to check / do |
+|---|---|---|
+| RDP times out | SG, NACL, route, or local network | SG has TCP 3389 from your IP, NACL allows, route table has IGW, run `Test-NetConnection` |
+| `TcpTestSucceeded: True` but RDP fails (`0x904`) | Firewall/proxy drops the RDP session | Try hotspot/VPN, or use **Fleet Manager** |
+| "Credentials didn't work" | Wrong user or password | User is `Administrator`; decrypt again; choose *Use a different account* |
+| "Password not available yet" | Instance still initializing | Wait a few minutes; wait for 2/2 status checks |
+| Black screen or hangs after connect | Windows still starting | Wait, or *Actions → Monitor and troubleshoot → Get instance screenshot* |
+| Cannot decrypt password | No key pair, or non-RSA key | Must launch with an RSA key pair |
+| Not visible in Fleet Manager | No role, wrong Region, agent not registered | Verify role and policy, Region, reboot, wait 10 minutes |
+| RDP disabled inside Windows (rare) | Custom image or setting changed | Fix via SSM (below) |
+
+Useful commands:
+
+```powershell
+# From your PC: check that the RDP port is reachable
+Test-NetConnection <public-ip> -Port 3389
+```
+
+```powershell
+# On the instance (via SSM): re-enable RDP if it was disabled
+Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name fDenyTSConnections -Value 0
+Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+```
+
+---
+
+## Security Best Practices
+
+- Do not leave RDP (3389) open to `0.0.0.0/0`. Restrict it to **My IP**, or delete the rule entirely once Fleet Manager works.
+- Only open HTTP/HTTPS if the instance really serves web traffic.
+- Keep the `.pem` private. Add `*.pem` to `.gitignore`. Never commit keys.
+- Do not publish account IDs, public IPs, or keys in public repositories.
+- Prefer Fleet Manager / Session Manager over exposing management ports to the internet.
+- Use a strong Administrator password and consider creating a separate admin user.
+
+---
+
+## Cleanup and Cost Control
+
+**Stop** does not stop all charges, because EBS storage is still billed. **Terminate** removes the instance and its root volume.
+
+| | Stop | Terminate |
+|---|---|---|
+| Instance / Windows license hourly charge | Stops | Stops |
+| 30 GiB EBS volume | **Still billed** | Deleted by default |
+| Data | Kept | **Lost permanently** |
+| Can restart | Yes | No |
+
+Cleanup steps:
+
+1. Copy any important files out of Windows first.
+2. **EC2 → Instances → Instance state → Terminate instance**. If disabled, turn off termination protection first (*Actions → Instance settings → Change termination protection*).
+3. **EC2 → Volumes**: delete any leftover `available` volumes.
+4. **EC2 → Elastic IPs**: release any unused addresses.
+5. Optional (free, but tidy): delete the security group, the IAM role(s), and the key pair.
+6. Optional: turn off Default Host Management (Fleet Manager → Settings) if enabled.
+7. After a few days, check **Billing → Bills** to confirm no unexpected charges.
+
+---
+
+## Key Takeaways
+
+1. Windows uses **RDP (3389)**, Linux uses **SSH (22)**.
+2. Launch Windows with an **RSA key pair**. It is needed to decrypt the Administrator password.
+3. Security group: allow **inbound TCP 3389 from My IP**; keep the default **outbound allow-all**.
+4. The default NACL already allows everything; custom NACLs must allow 3389 in and ephemeral ports (1024-65535) out.
+5. `Test-NetConnection` success does **not** guarantee RDP works. Corporate firewalls can drop the RDP session.
+6. Error `0x904` before the login prompt means a **network problem**, not credentials.
+7. **Fleet Manager** fixes it by using outbound HTTPS 443 through the SSM Agent. It needs an IAM role with `AmazonSSMManagedInstanceCore`.
+8. **Terminate** (not just Stop) to fully stop billing.
