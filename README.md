@@ -2887,7 +2887,7 @@ A complete runbook, from launching a Windows Server EC2 instance to connecting t
 | Region | us-east-1 (N. Virginia) |
 | VPC | Default VPC |
 | Login method | RSA key pair (`.pem`) to decrypt the Administrator password |
-| Client network | Office network (private range `172.16.x.x`) |
+| Client network | Office network (private range `19.x.x.x`) |
 
 Linux vs Windows, the main difference:
 
@@ -3051,7 +3051,7 @@ Result: `TcpTestSucceeded : True`
 
 ## Root Cause
 
-My PC was on an **office network** (`172.16.x.x`). The office firewall allowed the TCP handshake on 3389 but interfered with the actual RDP session, so RDP failed with `0x904`.
+My PC was on an **office network** (`19.x.x.x`). The office firewall allowed the TCP handshake on 3389 but interfered with the actual RDP session, so RDP failed with `0x904`.
 
 Ways to confirm this (any one):
 
