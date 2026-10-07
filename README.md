@@ -3246,10 +3246,10 @@ Let suppose there's an nginx controller that we deployed in a kubernetes cluster
 ![Ingress](WhatsApp%20Image%202026-10-01%20at%202.46.24%20AM.jpeg)<br></br>
 
 bs aik cheez yaad rakho.. start may ingress controller create hoga..kaisey create hoga? ingress resource (yaml file) ko dekh kay... aur phir ye ingress controller aws ka load balancer configure karey ga.. ingress controller ka kaam sirf itna ha kay is nay AWS API call kr kay AWS load balancer banana ha...aur ye load balancer further request ko service tk le kay jaye ga...ye ingress resource aur controller wala kaam sirf shuru may aik hi dafa hoga.. jb AWS load balancer ban gaya/configure ho gaya phir is controller ki zaroorat nhi ha..
-
+![controller](controller.png)<br></br>
 
 aur ye bhi yaad rakhna kay ingress controller aur ingress resource kuberenetes world ki cheezein hain aur AWS ALB Aws world ki cheez ha tou in ko communicate karwaney say pehle oidc connecter provider url wala kaam karna parey ga..phir aik custom policy banani parey gi..aur hum phir aik role bna kay us may custom policy attach karein gay than us role ko iamserviceaccount kay sath attach karein gay <br></br>
-
+![ALB](ALB.png)<br></br>
 
 When one AWS service wants to communicate with another aws service we create the iam roles.. in the same way when we create a kubernetes pods we can attach/integrate the iam role with kubernetes service accounts so they can access/talk-to other aws services when needed<br></br>
 if we want to deploy pod on custom namespaces other than default then we have to add the another fargate profile for this purpose<br></br>
