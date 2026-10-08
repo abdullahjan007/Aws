@@ -3303,3 +3303,6 @@ helm repo update <br></br>
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=demo-cluster-1 --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller --set region=us-east-1 --set vpcId=<vpc-id> <br></br>
 9. comtroller setup hogaya ha ye ab aws alb ko configure karey ga aur 5 min baad hum AWS load balanccer kholein gay tou hum running show ho rha ho ga.. phir hum jb us kay url ko browser pay kholein gay tb humey hamari deployed application mil jaye gi<br></br>
 
+# IMP POINT<br></br>
+1. alb controller or ingress controller actual may aik pod hi hota ha..aur ye cluster-level component ha tou ye usually us namespace may nhi hota jidher baqi application/pods hoti hain.. ye un say alaag namespace may hota ha most of the time<br></br>
+2. jis tarha hum temporary access kay liye aws may role create kartey hain.. isi tarha temporary access kay liye hum eks may service accounts create kartey hain...aur phir role aur service account oidc kay through connect hotey hain <br></br>
