@@ -3306,3 +3306,7 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n ku
 # IMP POINT<br></br>
 1. alb controller or ingress controller actual may aik pod hi hota ha..aur ye cluster-level component ha tou ye usually us namespace may nhi hota jidher baqi application/pods hoti hain.. ye un say alaag namespace may hota ha most of the time<br></br>
 2. jis tarha hum temporary access kay liye aws may role create kartey hain.. isi tarha temporary access kay liye hum eks may service accounts create kartey hain...aur phir role aur service account oidc kay through connect hotey hain <br></br>
+# Q: what is fargate profile?<br></br>
+Fargate profile EKS (Elastic Kubernetes Service) ka ek feature hai jo decide karta hai ke kaunse pods AWS Fargate (serverless compute) par chalein ge, EC2 worker nodes par nahi.<br></br>
+Simple words mein:<br></br>
+Aap ek profile banate ho jisme batate ho “is namespace (aur optionally in labels) wale pods Fargate par chalao”. Jab aise pod create hota hai, EKS automatically uske liye alag micro-VM bana deta hai. Aapko nodes manage, patch ya scale nahi karne parte.<br></br>
