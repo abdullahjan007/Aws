@@ -3293,4 +3293,13 @@ Phir console mein Resources page refresh karo (1-2 minute lag sakte hain). <br><
 Console/UI se karna ho to: Access tab, Create access entry, IAM principal mein arn:aws:iam::3********9:root paste karo, Standard type, aur AmazonEKSClusterAdminPolicy (scope: Cluster) attach karo. Pehle jo “already in use” error aaya tha wo AbdJan wale ARN pe tha, root pe nahi, to ab chalna chahiye. <br></br>
 
 is tarha say mera ye wala issue resolve ho gaya <br></br>
-6. phir is kay baad oidb connect kia <br></br>
+
+6. phir is kay baad oidc (open ip connector) connect kia with this command:[eksctl utils associate-iam-oidc-provider --cluster $cluster_name --approve] ab ye kaam kyu kia.. samjho... ALB controller nay ingress resource dekh kay AWS ALB configure karna ha.. ab AWS ALB aws world ki cheez ha aur ALB controller kubernetes world ki cheez ha.. so, kubernetes world ki ccheez nay aws world ki cheez use karni ha tou oidc kay through ye dono worlds connect hogi aur phir role baney ga jo service account kay sath communicate karey  ga (is ko aur detail may neechet discuss kartey hain)<br></br>
+7. phir is kay baad aik custom policy banai [command: aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam_policy.json]
+aur then role ko serviceaccount kay sath attach kia using this [command: eksctl create iamserviceaccount --cluster=<your-cluster-name> --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::<your-aws-account-id>:policy/AWSLoadBalancerControllerIAMPolicy --approve]
+8. abhi tk oidc connection ho gaya ha... policy ban gayi ha.. role service account kay sath attach ho gaya ha.. ab hum actual ALB controller install karein gay aur helm chart ko use karein gay ALB controller install karney kay liye..commands are below: <br></br>
+helm repo add eks https://aws.github.io/eks-charts <br></br>
+helm repo update <br></br>
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=demo-cluster-1 --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller --set region=us-east-1 --set vpcId=<vpc-id> <br></br>
+9. comtroller setup hogaya ha ye ab aws alb ko configure karey ga aur 5 min baad hum AWS load balanccer kholein gay tou hum running show ho rha ho ga.. phir hum jb us kay url ko browser pay kholein gay tb humey hamari deployed application mil jaye gi<br></br>
+
