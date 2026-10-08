@@ -3259,4 +3259,38 @@ if we want to deploy pod on custom namespaces other than default then we have to
 2. phir ye command use kr kay cluster bnao with fargate eksctl create cluster --name demo-cluster --region us-east-1 --fargate <br></br>
 3. ab cluster ban gaya ha tou kubeconfig upate kro [command: aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster ]<br></br>
 kubeconfig kia ha? ab dekho tumharey pas 3 clusters hain dev-cluster, staging-cluster, prod-cluster.. tumharey kubectl ko pta hi nhi hoga kay us nay kis cluster say communicate karna ha.. tou kubeconfig kubectl ko 3 cheezein bataye ga.. first api server kahan ha, second kubectl nay authenticate kaise karna ha, third us nay kis cluster say communicate karna ha.. jb kubectl kay pas ye teeno cheezein hogi aur hum jb kubectl get pods likhein gay tou wo humey sahi result la kay de ga.. <br></br>
-4. abhi hamarey pas jo fargate profile thi wo default namespaces kay sath thi...phir humney aik new fargate profile create ki with namespace game-2048... abhi namespace actual may create nhi ha.. bs sirf ye specigy kia ha humney kay deployments is namespace may hogi... namespace ko baad may proper create karein gay yaml file kay sath (not cnfrm.. fargate profile aur namespace waley concept ko abhi aik dafa dobara dekhna ha aj)...<br></br> 
+4. abhi hamarey pas jo fargate profile thi wo default namespaces kay sath thi...phir humney aik new fargate profile create ki with namespace game-2048 [command: eksctl create fargateprofile --cluster demo-cluster --region us-east-1 --name alb-sample-app --namespace game-2048] abhi namespace actual may create nhi ha.. bs sirf ye specify kia ha humney kay deployments is namespace may hogi... namespace ko baad may proper create karein gay yaml file kay sath (not cnfrm.. fargate profile aur namespace waley concept ko abhi aik dafa dobara dekhna ha aj)...<br></br>
+5. phir fargate profile create karney kay baad namespace, deployment, service aur ingress resource create kia using this command: kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/examples/2048/2048_full.yaml <br></br>
+
+is point pay mujhe aik issue aya.. mainey cli pay jab kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/examples/2048/2048_full.yaml ye command use ki tou mera namespace, deployment, service aur ingress resource ban gaye.. aur jb ma cli pay kubectl get pods kr rha hu pods bhi a rhy hain.. but jb ma ui pay gaya aur udher resources waley tab ma ja kay dekha tou koi pod, deployment wagera kuch bhi show nhi ho rha..us ki reason ye thi kay ui pay ma root user kay sath login hua va tha aur cli pay AbdJan waley iam user kay sath login tha is liye user mismatch ki wajha say ui pay kuch show nhi ho rha tha.. but cli pay saab kuch a rha tha...phir is issue ko access entry kay through resolve kia.. steps are given below: <br></br>
+
+Access entry banao: <br></br>
+a. Cluster demo-cluster-1 mein Access tab kholo <br></br>
+b. Create access entry pe click karo <br></br>
+c. IAM principal mein apna console wala user/role select karo <br></br>
+d. Type: Standard <br></br>
+e. Policy: AmazonEKSClusterAdminPolicy (ya sirf dekhne ke liye AmazonEKSViewPolicy), access scope Cluster <br></br>
+f. Create karo, phir Resources page refresh karo <br></br>
+ab scenario kia hua.. cli pay abdjan wala user tha aur ui pay root user tou technically mainey root user ko access entry deni thi but mainey ghalti kr di.. ma AbdJan waley user ko access entry de rha tha jis ki wajha say mujhe 2 aur errors aye.. first error is: "The specified access entry resource is already in use in this cluster" is error ko dekhney kay baad mainey ye steps kiye: <br></br>
+a. Cluster ke Access tab mein neeche IAM access entries list mein apna principal dhoondo <br></br>
+b. Us entry pe click karo <br></br>
+c. Access policies section mein Associate access policy pe click karo <br></br>
+d. AmazonEKSClusterAdminPolicy select karo, scope Cluster, aur Add policy karo <br></br>
+e. Resources page refresh karo <br></br>
+ye uper waley steps kartey hue bhi mainey yehi ghalti ki.. AbdJan waley user ko select kia.. jis ki wajha say mera issue resolve na hua.. phir claude nay mujhe bola kay aws sts get-caller-identity kr kay cli pay apna user dekh aur ui may right-top-corner pay jidher Account ID likhi hoti ha udher apna user dekh.. ab jb dekha tou wohi mismatch UI pay root user aur cli pay AbdJan...phir claude ka jo response tha wo ma neechey share karta hu<br></br>
+Yehi masla hai. Console mein tum root user se login ho, aur tumhara access entry sirf user/AbdJan ke liye hai. Root ka ARN alag hota hai, isliye Kubernetes root ko nahi pehchanta. <br></br>
+
+Fix: Root ke liye access entry banao <br></br>
+
+Tumhare terminal ki identity (user/AbdJan) ke paas cluster admin access hai, to terminal se hi kar do: <br></br>
+
+aws eks create-access-entry --cluster-name demo-cluster-1 --region us-east-1 --principal-arn arn:aws:iam::3********9:root <br></br>
+
+aws eks associate-access-policy --cluster-name demo-cluster-1 --region us-east-1 --principal-arn arn:aws:iam::3********9:root --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy --access-scope type=cluster <br></br>
+
+Phir console mein Resources page refresh karo (1-2 minute lag sakte hain). <br></br>
+
+Console/UI se karna ho to: Access tab, Create access entry, IAM principal mein arn:aws:iam::3********9:root paste karo, Standard type, aur AmazonEKSClusterAdminPolicy (scope: Cluster) attach karo. Pehle jo “already in use” error aaya tha wo AbdJan wale ARN pe tha, root pe nahi, to ab chalna chahiye. <br></br>
+
+is tarha say mera ye wala issue resolve ho gaya <br></br>
+6. phir is kay baad oidb connect kia <br></br>
