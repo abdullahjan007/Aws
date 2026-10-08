@@ -3253,3 +3253,10 @@ aur ye bhi yaad rakhna kay ingress controller aur ingress resource kuberenetes w
 
 When one AWS service wants to communicate with another aws service we create the iam roles.. in the same way when we create a kubernetes pods we can attach/integrate the iam role with kubernetes service accounts so they can access/talk-to other aws services when needed<br></br>
 if we want to deploy pod on custom namespaces other than default then we have to add the another fargate profile for this purpose<br></br>
+
+# Implementation of eks <br></br>
+1. saab say pehle apney system pay aws cli,kubectl aur eksctl install kro aur aws cli configure kro <br></br>
+2. phir ye command use kr kay cluster bnao with fargate eksctl create cluster --name demo-cluster --region us-east-1 --fargate <br></br>
+3. ab cluster ban gaya ha tou kubeconfig upate kro [command: aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster ]<br></br>
+kubeconfig kia ha? ab dekho tumharey pas 3 clusters hain dev-cluster, staging-cluster, prod-cluster.. tumharey kubectl ko pta hi nhi hoga kay us nay kis cluster say communicate karna ha.. tou kubeconfig kubectl ko 3 cheezein bataye ga.. first api server kahan ha, second kubectl nay authenticate kaise karna ha, third us nay kis cluster say communicate karna ha.. jb kubectl kay pas ye teeno cheezein hogi aur hum jb kubectl get pods likhein gay tou wo humey sahi result la kay de ga.. <br></br>
+4. abhi hamarey pas jo fargate profile thi wo default namespaces kay sath thi... kubeconfig upate karney kay baad fargate profile add karni ha (is ki detail abhi samjhein gay kay kyu fargate profile add ki)... 
