@@ -4077,3 +4077,15 @@ Dono flows ek doosre se connected hain, lekin unka purpose different hai:
 * ServiceAccount + IRSA: Kubernetes workload ki AWS identity aur authorization.
 * IAM Role + IAM Policy: AWS mein trust aur permissions.
 * Ingress + AWS Load Balancer Controller: Application traffic ke liye AWS load balancer configuration.
+
+# ********************************************************
+# SECRETS MANAGEMENT ON AWS <br></br>
+Secrets management is a very important topic in aws and mostly secrets management questions are asked in interviews as well.. When we write ci/cd we have to deal with docker username, docker password, registery url, db username and passwords, these all are confidental data and we won't allow anyone to expose this.. so in order to make things secure we use three things in aws <br></br>
+System Manager <br></br>
+Secrets Manager <br></br>
+HashiCorp Vault <br></br>
+
+Now discuss when to use which one...
+in case of docker image we need docker username, docker password and registery url.. username and registery url are secrets but not too confidential... so we can add these two secrets in systems manager... because secrets from system manager are easily accessable.. but when discuss about db passowords like things then we should go for secrets manager.. because in secret manager we can set a password rotate feature as well.. like rotate the passwords after 1 week.. so for most confidential data... secrets manager are very useful... in short, System manager is used for storing less sensitive information like registry url , docker username and Secret manager is used for storing the very sensitive information like DB pass , Docker  password.. We can also rotate the secrets as well in secrets manager...if we only use secrets manager then it is very costly so we use the combination of both secrets manager and system manager for storing the most confidential and less confidential secrets respectively <br></br>
+When to use hashicorp vauult?
+this system manager and secrets manager are aws managed services but hashicorp vault is not an aws managed service so if your orginzation works on hybrid cloud or multi cloud then you should go for hashcorp vault because it works on azure, aws, and gcp as well.. and it is an open source community and very secure secrets managed platform <br></br>
