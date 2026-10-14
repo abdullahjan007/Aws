@@ -4089,3 +4089,59 @@ Now discuss when to use which one...
 in case of docker image we need docker username, docker password and registery url.. username and registery url are secrets but not too confidential... so we can add these two secrets in systems manager... because secrets from system manager are easily accessable.. but when discuss about db passowords like things.... then we should go for secrets manager.. because in secret manager we can set a password rotate feature as well.. like rotate the passwords after 1 week.. so for most confidential data... secrets manager are very useful... in short, System manager is used for storing less sensitive information like registry url , docker username and Secret manager is used for storing the very sensitive information like DB pass , Docker  password.. We can also rotate the secrets as well in secrets manager...if we only use secrets manager then it is very costly so we use the combination of both secrets manager and system manager for storing the most confidential and less confidential secrets respectively <br></br>
 When to use hashicorp vauult?
 this system manager and secrets manager are aws managed services but hashicorp vault is not an aws managed service so if your orginzation works on hybrid cloud or multi cloud then you should go for hashcorp vault because it works on azure, aws, and gcp as well.. and it is an open source community and very secure secrets managed platform <br></br>
+********************************
+# Terraform from Abhsihek <br></br>
+when we do terraform practical.. i login as an iam user AbdJan and fortunately my iam user has an admin access so i don't face any permission issue.. but if someone login with an iam user that don't have necessary permissions so he might face an issue while doing the practical.. that's why abhishek suggest kay first time do a practice with root user/account to avoid permission related issues <br></br>
+Whenever we are going to create something new we first have to define the provider.. provider is basically in which we tell terraform to automate the infra on aws, or on azure or on gcp or on openstack, or on alibaba so for all this we have to first define the provider (not cnfrm) <br></br>
+
+provider.tf: <br></br>
+provider "aws" {  <br></br>
+  <PROVIDER_ARGUMENTS>
+  region   = "<region>" <br></br>
+  access_key = "<access_key>" <br></br>
+  secret_key = "<secret_key>" <br></br>
+} <br></br>
+
+provider block kuch is tarha ka dikhta ha but it is not a good prac kay access key aur secret key is tarha hardcode ki jaye.. so we simply give that access and secret key during aws configure command...an alternative approach is to create/define environment variable or tfrs file but it's a later topic <br></br>
+we can also write every configuration in one file but it is a good thing to make separate files <br></br>
+if we want to automate the things via terraform we first must know how things are created via UI.. like ager mainey EC2 instance terraform kay through banana ha tou mujhe pehle pta hona chahiye kay UI pay kaisey ma is ko banata hu kia neccesary things hain jo ma UI pay karta hu like ami select karta hu may, security group select karta hu.. ager ma nhi kru ga tou wo default select kr le ga..ye saab cheezein ager mujhe ui pay karni ati hogi tb hi ma easily terraform pay kr saku ga <br></br>
+now in order to create something we write a resource block.. resource is something that creates an infra on our desisred provider like in our case it is aws <br></br>
+
+main.tf: <br></br>
+resource "aws_vp" "my_vpc"{ <br></br>
+  cidr_block = "10.0.0.0/16" <br></br>
+} <br></br>
+
+in the above resource block we hardcode the cidr_block but the correct approach is to create a variables.tf file and refrence the value from their as you can see below:<br></br>
+
+variables.tf: <br></br>
+variable "cidr"{  <br></br>
+  default = "10.0.0.0/16" <br></br>
+} <br></br>
+
+now my main.tf becomes <br></br>
+main.tf: <br></br>
+resource "aws_vpc" "my_vpc"{ <br></br>
+  cidr_block = var.cidr <br></br>
+} <br></br>
+when we are writing the terraform code it is good practice to go to ui and see what necessary things we need to do inorder to create something.. like mainey subnet banana ha tou ma pehle ui pay jao ga aur dekhu ga kay subnet bananey kay liye mujhe kia kuch dena parey ga like vpc select karna parey ga, cidr range deni parey gi etc... so inshort keep ui as a reference as well <br></br>
+
+main.tf: <br></br>
+main.tf: <br></br>
+resource "aws_vpc" "my_vpc"{ <br></br>
+  cidr_block = var.cidr <br></br>
+} <br></br>
+
+resource "aws_subnet" "sub1" { <br></br>
+  vpc = aws_vpc.my_vpc.id (yaha pay mainey wohi vpc select kia ha jo uper waley resource block may banaya ha <br></br>
+  cider_block = "10.0.0.0/24" (is ko variable.tf may bhi define kr sakta tha... ye mainey is range (10.0.0.0/16) kay ander hi rakha ha <br></br>
+  map_public_ip_on_launch=true <br></br>
+} <br></br>
+
+resource "aws_subnet" "sub2" { <br></br>
+  vpc = aws_vpc.my_vpc.id (yaha pay mainey wohi vpc select kia ha jo uper waley resource block may banaya ha <br></br>
+  cider_block = "10.0.1.0/24" (is ko variable.tf may bhi define kr sakta tha... ye mainey is range (10.0.0.0/16) kay ander hi rakha ha <br></br>
+  map_public_ip_on_launch=true <br></br>
+} <br></br>
+
+abhi tk sirf vpc aur subnet blocks baney hain <br></br>
