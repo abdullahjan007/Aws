@@ -4163,7 +4163,7 @@ resource "aws_route_table" "RT"{ <br></br>
   } <br></br>
 } <br></br>
 
-ab route tou bta diya ha route table ko kay us nay vpc kay ander all traffic ko internet gateway tk le kay jana ha but ye nhi btaya kay kis subnet say us nay all traffic ko internet gateway tk le kay jana ha..tou neechey hum subnet define karein gay...UI may subnet association waley block may ja kay hum subnet ko select kartey hain aur terraform kay ander given below<br></br>
+ab route tou bta diya ha route table ko kay us nay vpc kay ander all traffic ko internet gateway tk le kay jana ha but ye nhi btaya kay kis subnet say us nay all traffic ko internet gateway tk le kay jana ha..tou neechey hum subnet define karein gay jis ki traffic ko wo igw tk le kay jaye ga...UI may subnet association waley block may ja kay hum subnet ko select kartey hain aur terraform kay ander given below<br></br>
 
 resource "aws_route_table_association" "rta1"{ <br></br>
   subnet_id = aws_subnet.sub1.id <br></br>
