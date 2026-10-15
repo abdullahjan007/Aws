@@ -4174,3 +4174,36 @@ resource "aws_route_table_association" "rta2"{ <br></br>
   subnet_id = aws_subnet.sub2.id <br></br>
   rouute_table_id = aws_route_table.RT.id <br></br>
 } <br></br>
+
+sidenote: default security group don't allow inbound rule, they only have outbounds rule, inbound rules are called ingress and outbound rules are called egress in terraform <br></br>
+
+resource "aws_security_group" "mysg" { <br></br>
+  name        = "custom-sg-terraform" <br></br>
+  vpc_id      = aws_vpc.my_vpc.id <br></br>
+
+} <br></br>
+ingress { <br></br>
+  description = "TLS from VPC" <br></br>
+  from_port = 80 <br></br>
+  to_port = 80 <br></br>
+  ip_protocol = "tcp" <br></br>
+  cidr_block = ["0.0.0.0/0"] <br></br>
+} <br></br>
+
+ingress { <br></br>
+  description = "HTTP from VPC" <br></br>
+  from_port = 22 <br></br>
+  to_port = 22 <br></br>
+  ip_protocol = "tcp" <br></br>
+  cidr_block = ["0.0.0.0/0"] <br></br>
+} <br></br>
+egress{ <br></br>
+  from_port = 0 <br></br>
+  to_port = 0 <br></br>
+  protocol = "-1" <br></br>
+  cidr_block = ["0.0.0.0/0"] <br></br>
+} <br></br>
+tags = { <br></br>
+  Name = "custom-sg-terraform" <br></br>
+} <br></br>
+} <br></br>
