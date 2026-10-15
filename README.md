@@ -4145,3 +4145,32 @@ resource "aws_subnet" "sub2" { <br></br>
 } <br></br>
 
 abhi tk sirf vpc aur subnet blocks baney hain <br></br>
+
+internet gateway bnaney ka simple tareeka ha bs pta hona chahiye kay kis vpc may banana ha <br></br>
+
+resource "aws_internet_gateway" "igw"{ <br></br>
+  vpc_id = aws_vpc.my_vpc.id (bs sirf define karna ha kay internet gateway kis vpc may banana ha ban jaye ga) <br></br>
+} <br></br>
+
+ab internet gateway tou ban gaya ha but routetable bhi tou banana ha naw vpc may jo traffic ko route karey ga from one point to another...like hamarey case may hum outbound wala kaam kr rhy hain.. hum kehtey hain kay subnet ya vpc kay ander jo kuch bhi ha wo internet gateway tk jaye tou us ko hum aisey define karen gay routetable may: <br></br>
+
+resource "aws_route_table" "RT"{ <br></br>
+  vpc_id = aws_vpc.my_vpc.id (saab say pehle btana ha kay kis vpc may route table banana ha) <br></br>
+  route{ <br></br>
+    cidr_block = "0.0.0.0/0" (means everything in subnet/vpc) <br></br>
+    gateway_id = aws_internet_gateway.igw.id (internet gate way ki id) <br></br>
+    (insort is route block may humney destination or target btaya ha kay all traffic of subet/vpc jo ha wo internet gateway tk jaye) <br></br>
+  } <br></br>
+} <br></br>
+
+ab route tou bta diya ha route table ko kay us nay vpc kay ander all traffic ko internet gateway tk le kay jana ha but ye nhi btaya kay kis subnet say us nay all traffic ko internet gateway tk le kay jana ha..tou neechey hum subnet define karein gay...UI may subnet association waley block may ja kay hum subnet ko select kartey hain aur terraform kay ander given below<br></br>
+
+resource "aws_route_table_association" "rta1"{ <br></br>
+  subnet_id = aws_subnet.sub1.id <br></br>
+  rouute_table_id = aws_route_table.RT.id <br></br>
+} <br></br>
+
+resource "aws_route_table_association" "rta2"{ <br></br>
+  subnet_id = aws_subnet.sub2.id <br></br>
+  rouute_table_id = aws_route_table.RT.id <br></br>
+} <br></br>
