@@ -4207,3 +4207,27 @@ tags = { <br></br>
   Name = "custom-sg-terraform" <br></br>
 } <br></br>
 } <br></br>
+ ab s3 bucket bnani ha s3 bucket bananey ka simple scene ha.. simply aik unique bucket name rakho <br></br>
+ resource "aws_s3_bucket" "example" { <br></br>
+  bucket = "abdulla-s3-bucket-name-terraform-17102026" <br></br>
+} <br></br>
+
+is kay baad ec2 instance banana ha.. ec2 kay liye important things hoti hain ami select karna, security group select karna, subnet select karna kay kis subnet may ec2 hoga aur ec2 type select karna like t2.micro etc... aik aur important cheez ec2 banatey waqt option ata ha advance settings ka jis ko hum usually dekhtey nhi hain.. us advance settings waley option ka bilkul last point jo ha wo user data ka ha us may hum apney scripts wagera run kr saktey hain ya kuch installation wagera kr saktey hain.. like ma chahta hu kay jb mera ec2 instance run ho intially tou aik screen aye jis pay abdullah_king likha ho ya phir jb mera ec2 intially start ho tou us kay ander kuch tools already install ho tou is tarha ki cheezein ya script hum user data waley block may rakhtey hain... ab ager terraform kay through mainey ye script wagera run karna ho tou better option ye ha kay script kay liye alaag say file bna lo aur ec2 instance waley resource block may us file ko call kro... aik reminder ye script file encode honi chahiye base256 may.. tou is ko use karney say pehle base64encode llikhna ha jaisey may neechey likhu ga... <br></br>
+resource "aws_instance" "webserver1"{ <br></br>
+  ami = "ami-00498323523478" <br></br>
+  instance_type = "t3.micro" <br></br>
+  vpc_security_group_ids = [aws_security_group.mysg.id] <br></br>
+  sunet_id = aws_subnet.sub1.id <br></br>
+  user_data = base64encode(file("userdata.sh")) <br></br>
+} <br></br>
+
+resource "aws_instance" "webserver2"{ <br></br>
+  ami = "ami-00498323523478" <br></br>
+  instance_type = "t3.micro" <br></br>
+  vpc_security_group_ids = [aws_security_group.mysg.id] <br></br>
+  sunet_id = aws_subnet.sub2.id <br></br>
+  user_data = base64encode(file("userdata1.sh")) <br></br>
+} <br></br>
+
+baqi sscript userdata.sh or userdata1.sh file may parey hain wo jb dekhna hoga tb abhishek ki github repo say dekh lena <br></br>
+aik cheez aur jb mera ye script run hoga tou ye server ip show karey ga.. ab ye aisey show karey ga??  in ec2 we have something called metadata which stores all the data in a particular IP address which is 169.254.169.254 so with this we can get all the different type of data <br></br>
