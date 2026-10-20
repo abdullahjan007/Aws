@@ -4231,3 +4231,59 @@ resource "aws_instance" "webserver2"{ <br></br>
 
 baqi sscript userdata.sh or userdata1.sh file may parey hain wo jb dekhna hoga tb abhishek ki github repo say dekh lena <br></br>
 aik cheez aur jb mera ye script run hoga tou ye server ip show karey ga.. ab ye aisey show karey ga??  in ec2 we have something called metadata which stores all the data in a particular IP address which is 169.254.169.254 so with this we can get all the different type of data <br></br>
+
+usually there are 3-4 types of load balancers but here we create an application load balancer <br></br>
+ab scene ye hota ha kay load balancer banana easy ha like simply bta do kay load balancer banao us ki type or btao kay wo public hoga, private hoga ya internal hoga.. or kyu kay load balancer ka traffic kay sath kaam hota ha is liye security group define karna parta ha kay kia allow ha aur kia nhi.. aur load balancer multiple subnets may traffic route karta ha.. is liye subnet bhi dena/btana hota ha that's it as shown below: <br></br>
+resource "aws_lb" "my_lb"{ <br></br>
+    name = "mylb" <br></br>
+    internal = false (means ye internal network load balancer nhi ha balkey public load balancer ha) <br></br>
+    load_balancer_type = "applicaation" <br></br>
+    security_groups = [aws_security_group.mysg.id] <br></br>
+    subnets = [aws_subnet.sub1.id,aws_subnet.sub1.id] <br></br>
+} <br></br>
+jb hum load balancer banatey hain even ui kay through bhi tou humey target group define karna parta ha.. like hum load balancer ko btatey hain kay jb bhi koi call karey tou is target pay request send karna aur wo target phir agey request ko instance pay forward kar de ga.. jb hum ui kay through target group banatey hain tou hum name, port, protocol usually HTTP detay hain aur sath may btatey hain kay target group kis vpc may ha.. is kay ilawa healthcheck bhi hum target group may configure kartey hain<br></br>
+resource "aws_lb_target_group" "mytg" { <br></br>
+  name     = "mytg" <br></br>
+  port     = 80 <br></br>
+  protocol = "HTTP" <br></br>
+  vpc_id   = aws_vpc.my_vpc.id <br></br>
+
+  health_check { <br></br>
+    path = "/" <br></br>
+    port = traffic-port <br></br>
+  } <br></br>
+} <br></br>
+
+abhi sirf target group bana ha.. but target group empty ha is kay ander kuch nhi ha.. tou ab hum apney instances ko is target group kay sath attach karein gay.. abhi kay liye hamarey 2 subnets aur 2 instances hain tou hum apni configuration ko 2 dafa likh dein gay for simplicity but usually loop ya count use hota for this multiple iteration..<br></br>
+ab instance ko target groups may attach karney ka simple tareeka ha.. hum resource block may target group arn likhtey hain, instance id aur port likhtey hain.. so is say pta chal jata ha kay kis instance nay kis target group kay sath kis port pay attach hona ha <br></br>
+
+resource "aws_lb_target_group_attachment" "attach1" { <br></br>
+  target_group_arn = aws_lb_target_group.mytg.arn <br></br>
+  target_id = aws_instance.webserver1.id <br></br>
+  port = 80 <br></br>
+} <br></br>
+
+resource "aws_lb_target_group_attachment" "attach2" { <br></br>
+  target_group_arn = aws_lb_target_group.mytg.arn <br></br>
+  target_id = aws_instance.webserver2.id <br></br>
+  port = 80 <br></br>
+} <br></br>
+
+abhi tk load balancer aur targret group ban gaya ha but ye apas may connect nhi hue abhi tk tou ab last step ye ha kay in ko connect karna ha apas may..(simply hum load balancer arn aur target group arn likh dein gay with necessary configurations tou kaam ho jaye ga) <br></br>
+
+resource "aws_lb_listener" "listener" { <br></br>
+  load_balancer_arn = aws_alb.myalb.arn <br></br>
+  port = 80 <br></br>
+  protocol ="HTTP" <br></br>
+  (ye uper tk saari configuration load balancer ki hogayai ab neechey target group ki configuration add karein gay.. jis may hum define karein gay kay hamara target group request forward karta ha redirect karta ha ya kuch aur karta ha ) <br></br>
+  default_action = { <br></br>
+    target_group_arn = aws_lb_target_group.mytg.arn <br></br>
+    type = "forward" <br></br>
+  } <br></br>
+} <br></br>
+
+let supppose we want the output of load balancer dns name tou hum output wala block define kr dein gay.. output ki hum separate file output.tf bhi bna saktey hain.. kabhi kabhi organization hume ui ka access allow nhi karti aur hum nay kuch ips ya dns wagera dekhni hoti hain instances aur load balancers ki tou is case may hum output.tf files ka use kartey hain <br></br>
+output "loadbalanerdns" { <br></br>
+  load_balancer_dns = aws_lb.myalb.dns_name <br></br>
+} <br></br>
+
