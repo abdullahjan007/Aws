@@ -4114,6 +4114,7 @@ resource "aws_vp" "my_vpc"{ <br></br>
 
 in the above resource block we hardcode the cidr_block but the correct approach is to create a variables.tf file and refrence the value from their as you can see below:<br></br>
 
+variable block may hum alaag say name = <value> nhi likhtey.. is may hum sirf resource ki configuration detay hain..name jo ha wo variable heading kay sath inverted commas may likha hota ha <br></br>
 variables.tf: <br></br>
 variable "cidr"{  <br></br>
   default = "10.0.0.0/16" <br></br>
