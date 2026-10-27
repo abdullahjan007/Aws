@@ -4288,7 +4288,7 @@ output "loadbalanerdns" { <br></br>
   load_balancer_dns = aws_lb.myalb.dns_name <br></br>
 } <br></br>
 
-# issues during practical <br></br>
+# issues during practical of terraform<br></br>
 issues naam/definition kay hi thay mostly like aws_route_table association tha, aws_route_table_subnet_association nhi tha.. isi tarha aws_lb tha aws_load_balancer nhi tha, isi tarha aws_lb_target_group_attachment tha.. baqi aur bhi chotey chotey issues thay like s3 bucket ki full permission nhi thi wo di.. loadbalancer same availablity zone may work nhi karta is liye subnet 1 ko alaag availablity zone may rakha aur subnet 2 ko alaag availabiliy zone may rakha... ec2 instance may jo secrurity group ko assign karnaey ki sahi key/command ye thi: vpc_security_groups_id = ... baqi isi tarha ki aur bhi choti choti mistakes thi wo prac kay sath resolve ho jayeein gi ya documentation dekh kay solve ho jayein gay, ya jb terraform ka full course kru ga tb ho jaye ga IA..... baqi apply kay baad url unreachable a rha tha tou target group dekha  us pay container unhealthy a rhy thay.. saab say pehle targret groups dekha kro.. containers unhealthy ho tou issue resolve kro.. issue ye tha kay simple http server wala script tha wo chal nhi rha tha phir apney instances may python 3 server wala code likha user_script may aur aur aik new line add ki user_data_replace_on_change = true is line ka kaam ye ha kay ye terraform apply pay saab kuch new nhi banaye gi sirf jo changings hain un ko remove/destroy kr kay new banaye gi.. (user_data_replace_on_change = true, taake script change hone par instance khud dobara ban jaye..Naye instances ban jayenge aur target group attachments bhi automatically update ho jayengi.) 
 ye updated script ha: <br></br>
 user_data = <<-EOF <br></br>
