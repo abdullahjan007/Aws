@@ -4298,3 +4298,167 @@ user_data = <<-EOF <br></br>
                 echo "Hello World from serverEC2 1" > index.html <br></br>
                 nohup python3 -m http.server 80 > /var/log/webserver.log 2>&1 & <br></br>
                 EOF <br></br>
+# terraform prac wala code: <br></br>
+# main.tf: <br></br>
+resource "aws_vpc" "myvpc" { <br></br>
+ cidr_block = var.cidr <br></br>
+}
+resource "aws_subnet" "mysubnet1" { <br></br>
+ vpc_id = aws_vpc.myvpc.id <br></br>
+ availability_zone = "us-east-1a" <br></br>
+ cidr_block = var.subnt1_cidr <br></br>
+} <br></br>
+resource "aws_subnet" "mysubnet2" { <br></br>
+ vpc_id = aws_vpc.myvpc.id <br></br>
+ availability_zone = "us-east-1b" <br></br>
+ cidr_block = var.subnt2_cidr <br></br>
+} <br></br>
+
+resource "aws_internet_gateway" "myigw" { <br></br>
+ vpc_id = aws_vpc.myvpc.id <br></br>
+} <br></br>
+
+resource "aws_s3_bucket" "mys3"{ <br></br>
+ bucket = "mybucket10-22-26" <br></br>
+} <br></br>
+
+resource "aws_s3_bucket_versioning" "mys3" { <br></br>
+ bucket = aws_s3_bucket.mys3.id <br></br>
+
+ versioning_configuration { <br></br>
+  status = "Enabled" <br></br>
+ } <br></br>
+} <br></br>
+
+resource "aws_route_table" "myrt" { <br></br>
+ vpc_id = aws_vpc.myvpc.id <br></br>
+ route { <br></br>
+ cidr_block = "0.0.0.0/0" <br></br>
+ gateway_id = aws_internet_gateway.myigw.id <br></br>
+ } <br></br>
+} <br></br>
+
+resource "aws_route_table_association" "myrtsa1" { <br></br>
+ subnet_id = aws_subnet.mysubnet1.id <br></br>
+ route_table_id = aws_route_table.myrt.id <br></br>
+} <br></br>
+
+resource "aws_route_table_association" "myrtsa2" { <br></br>
+ subnet_id = aws_subnet.mysubnet2.id <br></br>
+ route_table_id = aws_route_table.myrt.id <br></br>
+} <br></br>
+
+resource "aws_security_group" "mysg1" { <br></br>
+ vpc_id = aws_vpc.myvpc.id <br></br>
+ ingress { <br></br>
+ from_port = 22 <br></br>
+ to_port = 22 <br></br>
+ protocol = "tcp" <br></br>
+ cidr_blocks = ["0.0.0.0/0"] <br></br>
+ } <br></br>
+ ingress { <br></br>
+ from_port = 80 <br></br>
+ to_port = 80 <br></br>
+ protocol = "tcp" <br></br>
+ cidr_blocks = ["0.0.0.0/0"] <br></br>
+ } <br></br>
+ egress { <br></br>
+ from_port = 0 <br></br>
+ to_port = 0 <br></br>
+ protocol = "-1" <br></br>
+ cidr_blocks = ["0.0.0.0/0"] <br></br>
+ } <br></br>
+} <br></br>
+resource "aws_instance" "myinstance1" { <br></br>
+    ami                         = "ami-0d97d7f07b25dd693" <br></br>
+    instance_type               = "t3.micro" <br></br>
+    subnet_id                   = aws_subnet.mysubnet1.id <br></br>
+    vpc_security_group_ids      = [aws_security_group.mysg1.id] <br></br>
+    user_data_replace_on_change = true <br></br>
+    user_data = <<-EOF <br></br>
+                #!/bin/bash <br></br>
+                mkdir -p /var/www/site <br></br>
+                cd /var/www/site <br></br>
+                echo "Hello World from serverEC2 1" > index.html <br></br>
+                nohup python3 -m http.server 80 > /var/log/webserver.log 2>&1 & <br></br>
+                EOF <br></br>
+} <br></br>
+
+resource "aws_instance" "myinstance2" { <br></br>
+    ami                         = "ami-0d97d7f07b25dd693" <br></br>
+    instance_type               = "t3.micro" <br></br>
+    subnet_id                   = aws_subnet.mysubnet2.id <br></br>
+    vpc_security_group_ids      = [aws_security_group.mysg1.id] <br></br>
+    user_data_replace_on_change = true <br></br>
+    user_data = <<-EOF <br></br>
+                #!/bin/bash <br></br>
+                mkdir -p /var/www/site <br></br>
+                cd /var/www/site <br></br>
+                echo "Hello World from serverEC2 2" > index.html <br></br>
+                nohup python3 -m http.server 80 > /var/log/webserver.log 2>&1 & <br></br>
+                EOF <br></br>
+} <br></br>
+
+resource "aws_lb" "myalb" { <br></br>
+ load_balancer_type = "application" <br></br>
+ name = "myalb" <br></br>
+ internal = false <br></br>
+ ip_address_type = "ipv4" <br></br>
+ subnets = [aws_subnet.mysubnet1.id, aws_subnet.mysubnet2.id] <br></br>
+ security_groups = [aws_security_group.mysg1.id] <br></br>
+
+} <br></br>
+
+resource "aws_lb_target_group" "mytg" { <br></br>
+ target_type = "instance" <br></br>
+ protocol = "HTTP" <br></br>
+ port = 80 <br></br>
+ vpc_id = aws_vpc.myvpc.id <br></br>
+} <br></br>
+
+resource "aws_lb_target_group_attachment" "mytgas1" { <br></br>
+ target_group_arn = aws_lb_target_group.mytg.arn <br></br>
+ target_id = aws_instance.myinstance1.id <br></br>
+} <br></br>
+
+resource "aws_lb_target_group_attachment" "mytgas2" { <br></br>
+ target_group_arn = aws_lb_target_group.mytg.arn <br></br>
+ target_id = aws_instance.myinstance2.id <br></br>
+} <br></br>
+
+resource "aws_lb_listener" "mylb_listener" { <br></br>
+ load_balancer_arn = aws_lb.myalb.arn <br></br>
+ port = 80 <br></br>
+ protocol = "HTTP" <br></br>
+ default_action { <br></br>
+ type = "forward" <br></br>
+ target_group_arn = aws_lb_target_group.mytg.arn <br></br>
+ } <br></br>
+} <br></br>
+
+# variables.tf: <br></br>
+variable "cidr" { <br></br>
+ default = "10.0.0.0/16" <br></br>
+} <br></br>
+
+variable "subnt1_cidr" { <br></br>
+ default = "10.0.0.0/24" <br></br>
+} <br></br>
+
+variable "subnt2_cidr" { <br></br>
+ default = "10.0.1.0/24" <br></br>
+} <br></br>
+# provider.tf <br></br>
+terraform { <br></br>
+  required_providers { <br></br>
+    aws = { <br></br>
+      source  = "hashicorp/aws" <br></br>
+      version = "~> 6.0" <br></br>
+    } <br></br>
+  } <br></br>
+} <br></br>
+
+// Configure the AWS Provider <br></br>
+provider "aws" { <br></br>
+  region = "us-east-1" <br></br>
+} <br></br>
