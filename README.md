@@ -2539,6 +2539,23 @@ aik imp cheez aur.. starting ma jb ma repo create kr rha tha via cli tou authent
 aik abhi ma practical kru ga delete untagged images with 3 days ka.. ager image tag kiye beghair hum ecr pa push nhi kr saktey tou untagged images tou honi hi nhi chahiye.. phir ye kyu hain? reason is jb same image ko dobara build kar kay push kartey hain with same tag like latest ya v1 tou tag purani image say remove ho kay latest pushed image pa a jata ha aur purani image ko untagged kr deta ha<br></br>
 aur aik dafa repo create kr di aur aws ecr get-info-password | docker login --username "AWD" --password-stdin .............wala kaam kr diya tou ok ha baar baar nhi karna.. next time sirf image build karni ha.. tag karna ha us ko aur simply push karna ha<br></br>
 
+<account-id>.dkr.ecr.us-east-1.amazonaws.com/my-flask-app:v1 (is may <account-id>.dkr.ecr.us-east-1.amazonaws.com basically ecr registery ka url hota ha..jb hum login kartey hain tou wo actually registery ko hi authenticate karta ha.. aur my-flask-app image repo ka naam hota ha) <br></br> 
+Registry URL <br></br> 
+
+123456789012.dkr.ecr.us-east-1.amazonaws.com <br></br>
+
+AWS account ki ECR registry ka endpoint. <br></br>
+
+Repository <br></br>
+
+my-flask-app <br></br>
+
+Is repository mein Flask application ki Docker images store hongi. <br></br>
+
+Isliye: <br></br>
+- docker login mein registry URL diya jata hai, kyunke hum registry ke saath authenticate kar rahe hote hain. <br></br>
+- docker push mein registry URL ke saath repository name aur image tag bhi diya jata hai, kyunke hum ek specific repository mein image push karte hain <br></br>
+
 # Interview Question Regarding ECR: <br></br>
 Q1: Your CI/CD pipeline pushes to ECR successfully, but an ECS task in another environment fails to pull the image. Walk through your debugging steps.<br></br>
 
