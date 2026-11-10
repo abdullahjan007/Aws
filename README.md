@@ -4490,3 +4490,616 @@ simple sa scene ha saab say pehle config kholo aur setting may jao aur udher rec
 rules define kartey hue 2 cheezein ha ya tou hum aws managed rules select karein ya phir customn rules banaye (aik imp point, config sirf bataiye ga kay resource compliant ha ya nhi.. incasee ager resource non-compliant hoga tou config khud us ko compliant nhi karey ga ya resolve nhi karey ga.. config sirf non-cmpliant show kr de ga).. ab scene ye ga kay let suppose ma custom rule bnata kay jb bhi koi cheez compliant kay according na ho.. tou lambda ftn trigger ho aur wo lambda ftn dekh kay fooran cheez ko bta de kay ye compliant ha ya nhi..mujhe manually re-evaluate na karna parey...tou jb custom rule banatey ho lambda ftn kay through tou option hota ha kay ap nay apney ftn ko kaisey trigger karna ha tou us may hum usually select kr detay hain kay jb koi change ho resource may tb lambda ftn trigger ho.. isi tarha ye rule create kartey waqt lambda ftn arn required hota ha so it is better kay custom rule create karney say pehle lambda ftn create kr lein aur lambda may timeout ko increase kr kay 10s kr dein phir is lambda arn ko custom rule may add kr dein.. ab let suppose hamarey config nay multiple resources ya lambda ftn say communicate karna ha tou config may bydefault service-linked role ban jata ha jo config ki communication allow karwa deta ha <br></br>
 
 mainey config ka aik practical gpt kay through kia tha us may scene ye tha kay aik security group ko check karey ga ager port 22 every user kay liye enable hogi tou non-compliant aur ager nhi enable hogi tou compliant.. is process may lambda function ka role ye tha kay kay jaisey hi security group non-compliant hota ha tou lambda ftn trigger hota ha aur us security group ko delete kr deta ha... ab lambda ftn event bus kay through trigger ho rha tha like aws config recoreder security group ko check karta tha aur change/update honey pay json eventbus ko bhejta tha aur event bus matching prefix kay through kuch check kr kay lambda ftn trigger karta tha aur lambda us security group ko delete kr deta tha..is tarha ka kuch scenario tha but i am not cnfrm <br></br>
+
+# AWS Config + AWS Lambda Auto Remediation — Practical Lab
+
+## Project Overview
+
+Is project ka maqsad AWS mein Security Group ki public SSH access ko automatically remove karna hai, jab AWS Config us resource ko `NON_COMPLIANT` detect kare aur matching event EventBridge tak pohanche.
+
+Hum AWS Config, IAM, AWS Lambda aur Amazon EventBridge use karenge.
+
+### Architecture
+
+```text
+AWS Config
+    |
+    | Compliance Change Event
+    v
+Amazon EventBridge
+    |
+    | NON_COMPLIANT event
+    v
+AWS Lambda
+    |
+    | Check Security Group and tags
+    v
+EC2 Security Group
+    |
+    v
+Public SSH Rule Removed
+```
+
+### Technologies Used
+
+- AWS Config
+- Amazon EC2 Security Groups
+- AWS IAM
+- AWS Lambda
+- Amazon EventBridge
+- Python 3
+- Boto3
+
+### Lab Configuration
+
+| Setting | Value |
+|---|---|
+| AWS Region | `us-east-1` |
+| AWS Config Rule | `restricted-ssh` |
+| Lambda Function | `aws-config-ssh-remediation` |
+| EventBridge Rule | `aws-config-ssh-remediation-rule` |
+| Lab Security Group | `aws-config-lambda-lab` |
+| Required Tag | `Lab=AWSConfigLambdaLab` |
+| Target Port | TCP `22` |
+| Public IPv4 CIDR | `0.0.0.0/0` |
+
+**Important:** Yeh lab dedicated test Security Group ke liye hai. Production Security Groups par isay bina review ke use na karein.
+
+---
+
+## Step 1 — AWS Config Setup
+
+Sab se pehle AWS Console open karein aur region `us-east-1` select karein.
+
+1. AWS Console mein **AWS Config** open karein.
+2. AWS Config ko setup karein.
+3. Configuration Recorder enable karein.
+4. Resource recording settings mein ensure karein ke `AWS::EC2::SecurityGroup` resource type record ho raha ho.
+5. Agar AWS Config service-linked role create karne ka option aaye, to usay create karne dein.
+
+### AWS Config Service-Linked Role kya hai?
+
+AWS Config ko AWS resources ki configuration read karne aur unki changes track karne ke liye permissions chahiye hoti hain.
+
+AWS Config ka service-linked role aam tor par yeh hota hai:
+
+`AWSServiceRoleForConfig`
+
+Yeh AWS Config ko uske authorized operations perform karne ki permission deta hai.
+
+**Note:** Resource type record na ho to AWS Config Security Group ki configuration ko expected tareeqay se evaluate nahi kar payega.
+
+---
+
+## Step 2 — AWS Config Managed Rule Create Karna
+
+Ab hum AWS Config mein ek managed rule create karenge jo public SSH access ko detect karega.
+
+1. AWS Config → **Rules** open karein.
+2. **Add rule** par click karein.
+3. AWS managed rules mein `restricted-ssh` search karein.
+4. Rule select karein.
+5. Rule ka naam `restricted-ssh` rakhein, agar console is naam ko configure karne ka option de.
+6. Configuration review karein.
+7. Rule create karein.
+
+### Rule ka purpose
+
+Yeh rule un Security Groups ko detect karta hai jin mein SSH port `22` public IPv4 address `0.0.0.0/0` se accessible ho.
+
+Example of an insecure inbound rule:
+
+| Type | Protocol | Port | Source |
+|---|---|---|---|
+| SSH | TCP | 22 | `0.0.0.0/0` |
+
+`0.0.0.0/0` ka matlab hai ke rule IPv4 ke tamam addresses se traffic allow karta hai.
+
+SSH ko poore internet ke liye open rakhna security risk hai.
+
+### Compliance status
+
+AWS Config evaluation ke baad resources ki status yeh ho sakti hai:
+
+- `COMPLIANT`
+- `NON_COMPLIANT`
+- `NOT_APPLICABLE`
+- `INSUFFICIENT_DATA`
+
+Agar Security Group public SSH allow kar raha ho to woh `NON_COMPLIANT` ho sakta hai.
+
+---
+
+## Step 3 — Dedicated Lab Security Group Create Karna
+
+Ab hum ek dedicated Security Group banayenge jahan Lambda remediation ko test kar sakein.
+
+1. AWS Console → **EC2** open karein.
+2. **Network & Security → Security Groups** par jayein.
+3. **Create security group** select karein.
+4. Security Group name rakhein:
+
+   `aws-config-lambda-lab`
+
+5. Description likhein:
+
+   `Dedicated lab Security Group for AWS Config Lambda remediation`
+
+6. VPC select karein.
+7. Lab tag add karein:
+
+| Key | Value |
+|---|---|
+| `Lab` | `AWSConfigLambdaLab` |
+
+8. Inbound rules mein test ke liye yeh rule add karein:
+
+| Type | Protocol | Port | Source |
+|---|---|---|---|
+| SSH | TCP | 22 | `0.0.0.0/0` |
+
+9. Security Group create karein aur uski ID note karein.
+
+Example:
+
+`sg-0123456789abcdef0`
+
+Yeh sirf example hai. Apni actual Security Group ID use karein.
+
+### Security precaution
+
+Is Security Group ko kisi production EC2 instance ke saath attach na karein. Public SSH rule sirf isolated lab mein test karna hai.
+
+---
+
+## Step 4 — Lambda Execution Role aur IAM Policy
+
+Lambda ko Security Group read karne aur matching inbound rule remove karne ke liye IAM permissions chahiye hoti hain.
+
+### 4.1 Lambda execution role
+
+Lambda function create karte waqt basic execution role create karein, ya existing role select karein.
+
+Basic execution role mein CloudWatch Logs permissions bhi honi chahiye, taake Lambda ke logs dekhe ja sakein.
+
+### 4.2 Inline IAM policy
+
+IAM → Roles mein Lambda execution role open karein.
+
+**Add permissions → Create inline policy → JSON** select karein.
+
+Neeche policy mein `ACCOUNT_ID` aur `LAB_SECURITY_GROUP_ID` ko apni actual values se replace karein.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DescribeSecurityGroups",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeSecurityGroups"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "RemovePublicSSHFromLabGroup",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:RevokeSecurityGroupIngress"
+      ],
+      "Resource": "arn:aws:ec2:us-east-1:ACCOUNT_ID:security-group/LAB_SECURITY_GROUP_ID"
+    }
+  ]
+}
+```
+
+Policy ka naam rakh sakte hain:
+
+`AWSConfigLambdaLabRemediationPolicy`
+
+### Policy explanation
+
+**`ec2:DescribeSecurityGroups`**
+
+Lambda ko Security Group ki configuration, tags aur inbound rules read karne deta hai.
+
+**`ec2:RevokeSecurityGroupIngress`**
+
+Lambda ko Security Group ke inbound rules remove karne ki permission deta hai.
+
+**Least privilege**
+
+Remediation permission ko sirf dedicated lab Security Group ke ARN tak restrict kiya gaya hai. Is se Lambda ke permissions ka scope limited rehta hai.
+
+IAM policy save karne ke baad confirm karein ke yeh sahi Lambda execution role ke saath attached hai.
+
+---
+
+## Step 5 — AWS Lambda Function Create Karna
+
+Ab remediation logic ke liye Lambda function create karein.
+
+1. AWS Console → **Lambda** open karein.
+2. **Create function** par click karein.
+3. `Author from scratch` select karein.
+4. Function name:
+
+   `aws-config-ssh-remediation`
+
+5. Runtime: Python 3, jaise Python 3.12 agar available ho.
+6. Architecture: `x86_64`.
+7. Permissions mein Step 4 wala execution role select karein.
+8. Function create karein.
+
+### 5.1 Environment variable configure karna
+
+Lambda → Configuration → Environment variables open karein.
+
+Yeh variable add karein:
+
+| Key | Value |
+|---|---|
+| `LAB_SECURITY_GROUP_ID` | Tumhari actual lab Security Group ID |
+
+Example:
+
+```text
+LAB_SECURITY_GROUP_ID=sg-0123456789abcdef0
+```
+
+Actual ID use karna zaroori hai.
+
+### 5.2 Python remediation code
+
+Lambda ke **Code** tab mein `lambda_function.py` open karein aur yeh code paste karein:
+
+```python
+import boto3
+import os
+
+ec2 = boto3.client("ec2")
+
+LAB_SECURITY_GROUP_ID = os.environ["LAB_SECURITY_GROUP_ID"]
+
+EXPECTED_TAG_KEY = "Lab"
+EXPECTED_TAG_VALUE = "AWSConfigLambdaLab"
+
+
+def lambda_handler(event, context):
+
+    # Sirf configured lab Security Group ko inspect karo.
+    response = ec2.describe_security_groups(
+        GroupIds=[LAB_SECURITY_GROUP_ID]
+    )
+
+    security_group = response["SecurityGroups"][0]
+
+    # Lab tag verify karo.
+    tags = {
+        tag["Key"]: tag["Value"]
+        for tag in security_group.get("Tags", [])
+    }
+
+    if tags.get(EXPECTED_TAG_KEY) != EXPECTED_TAG_VALUE:
+        return {
+            "status": "skipped",
+            "reason": "Lab tag verification failed"
+        }
+
+    revoked_rules = []
+
+    # Inbound permissions inspect karo.
+    for permission in security_group.get("IpPermissions", []):
+
+        protocol = permission.get("IpProtocol")
+
+        # Sirf TCP port 22 ko target karo.
+        if protocol != "tcp":
+            continue
+
+        if permission.get("FromPort") != 22:
+            continue
+
+        if permission.get("ToPort") != 22:
+            continue
+
+        # Sirf public IPv4 CIDR 0.0.0.0/0 remove karo.
+        public_ranges = [
+            {"CidrIp": item["CidrIp"]}
+            for item in permission.get("IpRanges", [])
+            if item.get("CidrIp") == "0.0.0.0/0"
+        ]
+
+        if not public_ranges:
+            continue
+
+        ec2.revoke_security_group_ingress(
+            GroupId=LAB_SECURITY_GROUP_ID,
+            IpPermissions=[
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 22,
+                    "ToPort": 22,
+                    "IpRanges": public_ranges
+                }
+            ]
+        )
+
+        revoked_rules.extend(public_ranges)
+
+    return {
+        "status": "completed",
+        "security_group_id": LAB_SECURITY_GROUP_ID,
+        "revoked_public_ssh_rules": revoked_rules
+    }
+```
+
+Code paste karne ke baad **Deploy** par click karein.
+
+### Code kaam kaise karta hai?
+
+1. Environment variable se Security Group ID read karta hai.
+2. AWS EC2 API se us Security Group ki details retrieve karta hai.
+3. Confirm karta hai ke required lab tag maujood hai.
+4. Sirf TCP port 22 ke inbound rules inspect karta hai.
+5. `0.0.0.0/0` wali public IPv4 SSH rule ko remove karta hai.
+6. Result return karta hai.
+
+### Important limitations
+
+Yeh code sirf public IPv4 SSH rule ko remove karta hai. Yeh:
+
+- IPv6 source `::/0` ko remove nahi karta.
+- Port 22 ke doosre source CIDRs ko remove nahi karta.
+- Kisi doosre Security Group ko target nahi karta, jab tak environment variable badla na jaye.
+- Event ke andar diye gaye `resourceId` ko inspect nahi karta; yeh configured lab Security Group ID ko use karta hai.
+
+Is liye yeh lab-specific remediation hai, general-purpose remediation function nahi.
+
+---
+
+## Step 6 — Lambda Test Event Create Karna
+
+Ab verify karein ke Lambda ka code correctly execute ho raha hai.
+
+1. Lambda function `aws-config-ssh-remediation` open karein.
+2. **Test** section mein jayein.
+3. Create new test event select karein.
+4. Event name rakhein:
+
+   `test-ssh-remediation`
+
+5. Event JSON mein yeh paste karein:
+
+```json
+{}
+```
+
+6. Save ya Create par click karein.
+
+Is test ke liye empty JSON kaafi hai kyun ke Lambda handler event payload ko use nahi karta.
+
+---
+
+## Step 7 — Lambda Execute Karna aur Result Check Karna
+
+Ab **Test** button click karein.
+
+Agar Lambda successfully execute ho aur public SSH rule maujood ho, to output kuch is tarah ho sakta hai:
+
+```json
+{
+  "status": "completed",
+  "security_group_id": "sg-0123456789abcdef0",
+  "revoked_public_ssh_rules": [
+    {
+      "CidrIp": "0.0.0.0/0"
+    }
+  ]
+}
+```
+
+Actual Security Group ID tumhari apni hogi.
+
+### Successful execution ka matlab
+
+- Lambda execute hui.
+- Security Group read hua.
+- Lab tag verify hua.
+- Public SSH rule identify hua.
+- Rule remove karne ki API call successful hui.
+
+Agar output mein yeh ho:
+
+```json
+{
+  "status": "completed",
+  "security_group_id": "sg-0123456789abcdef0",
+  "revoked_public_ssh_rules": []
+}
+```
+
+To iska matlab ho sakta hai ke public SSH rule pehle hi remove ho chuka hai ya matching rule maujood nahi tha.
+
+Agar test fail ho, to execution result aur CloudWatch Logs mein exact error check karein.
+
+---
+
+## Step 8 — EC2 Security Group mein Verification
+
+Lambda test successful hone ke baad actual Security Group inspect karein.
+
+1. EC2 → **Security Groups** open karein.
+2. `aws-config-lambda-lab` select karein.
+3. **Inbound rules** tab open karein.
+4. SSH/TCP/22 rule check karein.
+
+Expected result:
+
+| Type | Protocol | Port | Source |
+|---|---|---|---|
+| SSH | TCP | 22 | `0.0.0.0/0` — removed |
+
+Agar yeh rule remove ho gaya hai, to manual Lambda remediation successful hai.
+
+### AWS Config status verify karna
+
+AWS Config → Rules → `restricted-ssh` open karein.
+
+Evaluation results mein lab Security Group ki compliance check karein.
+
+Expected result:
+
+`COMPLIANT`
+
+Evaluation update hone mein kuch waqt lag sakta hai.
+
+**Yaad rahe:** Manual Lambda test ki success se yeh prove hota hai ke remediation code kaam karta hai. Is se abhi automatic EventBridge triggering prove nahi hoti.
+
+---
+
+## Step 9 — EventBridge Rule Create Karna
+
+Ab AWS Config ke compliance change events ko Lambda se connect karein.
+
+### 9.1 EventBridge rule
+
+AWS Console → **Amazon EventBridge → Rules → Create rule**
+
+Yeh details configure karein:
+
+| Setting | Value |
+|---|---|
+| Name | `aws-config-ssh-remediation-rule` |
+| Event bus | `default` |
+| Rule type | Rule with an event pattern |
+| Target type | AWS service |
+| Target | Lambda function |
+| Lambda function | `aws-config-ssh-remediation` |
+
+### 9.2 Event pattern
+
+Custom event pattern mein yeh JSON use karein:
+
+```json
+{
+  "source": [
+    "aws.config"
+  ],
+  "detail-type": [
+    "Config Rules Compliance Change"
+  ],
+  "detail": {
+    "configRuleName": [
+      "restricted-ssh"
+    ],
+    "newEvaluationResult": {
+      "complianceType": [
+        "NON_COMPLIANT"
+      ]
+    },
+    "resourceType": [
+      "AWS::EC2::SecurityGroup"
+    ]
+  }
+}
+```
+
+### Event pattern ki explanation
+
+**`source: aws.config`**
+
+Sirf AWS Config ke events match karega.
+
+**`detail-type: Config Rules Compliance Change`**
+
+Config rule ki compliance state change se related events match karega.
+
+**`configRuleName: restricted-ssh`**
+
+Sirf specified AWS Config rule ke events match karega.
+
+**`complianceType: NON_COMPLIANT`**
+
+Sirf non-compliant result wala event match karega.
+
+**`resourceType: AWS::EC2::SecurityGroup`**
+
+Sirf EC2 Security Group resource ke events match karega.
+
+### 9.3 Lambda ko target configure karna
+
+1. Target type mein `AWS service` select karein.
+2. Target ke liye `Lambda function` select karein.
+3. Function `aws-config-ssh-remediation` choose karein.
+4. Rule create karne ke baad uska status `Enabled` verify karein.
+5. Lambda ke **Configuration → Triggers** section mein EventBridge rule listed hone ki tasdeeq karein.
+
+Agar console Lambda invocation permission add karne ka option de, to confirm karein ke EventBridge rule ko Lambda invoke karne ki permission mil rahi hai.
+
+### 9.4 Automatic triggering ka important point
+
+Ab architecture yeh hai:
+
+```text
+AWS Config
+    |
+    | Config Rules Compliance Change
+    v
+Amazon EventBridge
+    |
+    | Matching NON_COMPLIANT event
+    v
+Lambda: aws-config-ssh-remediation
+    |
+    | Lab tag and SSH rule check
+    v
+Public IPv4 SSH rule removal
+```
+
+Lekin sirf EventBridge rule create karne se Lambda automatically execute nahi hoti. AWS Config ko matching event generate karna hoga aur EventBridge ko us event ko match karke Lambda invoke karna hoga.
+
+Agar Security Group pehle hi `COMPLIANT` hai, to matching `NON_COMPLIANT` event na aana normal hai.
+
+AWS Config compliance events best-effort delivery par based hote hain, is liye event delivery ko metrics aur logs se verify karna zaroori hai.
+
+### Verification checklist
+
+- [ ] AWS Config recorder enabled hai.
+- [ ] `AWS::EC2::SecurityGroup` recording enabled hai.
+- [ ] `restricted-ssh` rule created hai.
+- [ ] Lab Security Group par `Lab=AWSConfigLambdaLab` tag hai.
+- [ ] Lambda execution role mein required EC2 permissions hain.
+- [ ] Lambda code deployed hai.
+- [ ] `LAB_SECURITY_GROUP_ID` environment variable set hai.
+- [ ] Manual Lambda test successful hai.
+- [ ] Public IPv4 SSH rule remove ho gaya hai.
+- [ ] EventBridge rule enabled hai.
+- [ ] Lambda trigger configured hai.
+- [ ] EventBridge invocation aur Lambda logs verify kiye gaye hain.
+
+---
+
+## Final Learning Summary
+
+Is practical mein humne yeh seekha:
+
+1. AWS Config resources ko record aur evaluate karta hai.
+2. Managed rule `restricted-ssh` public SSH exposure detect kar sakta hai.
+3. IAM execution role Lambda ko limited EC2 permissions deta hai.
+4. AWS Lambda Python code ke through remediation perform karti hai.
+5. Environment variables configuration ko code se separate rakhte hain.
+6. EventBridge AWS Config ke matching compliance events par Lambda invoke kar sakta hai.
+7. Manual test aur end-to-end automatic remediation alag cheezein hain.
+8. Compliance, invocation metrics aur CloudWatch Logs se automation verify ki jati hai.
+
+### Future improvements
+
+- Lambda ko event ke `resourceId` ke against validate karna.
+- IPv6 SSH exposure ko bhi handle karna.
+- CloudWatch alarms aur error monitoring add karna.
+- Multiple Security Groups ke liye controlled remediation design karna.
+- Production use se pehle unit tests, permissions review aur rollback strategy implement karna.
+
+**Security reminder:** Public SSH rule ko internet ke liye open rakhna sirf isolated lab mein test karein. Production mein SSH access ko approved IP ranges, VPN, bastion host ya AWS Systems Manager ke through control karein.
