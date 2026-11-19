@@ -5115,3 +5115,28 @@ jb hum likhtey hain linkedin.com tou request hamarey pas say ho kay linkedin kay
 Jb humney layer 7 pay load balancer use karna hota ha tb hum ALB ka use kartey hain.. jb hum nay layer 4 (transport layer) pay load balancer use karna hota ha tb hum NLB use kartey hain.. hum simple request bhejte hain like secure wagera nhi hoti request but jb wo ALB kay pas ponchti ha tou ALB us pay SSL offloading wagera karta ha aur secure kr kay server ko bhejta ha.. it can also perform rencrypt passthrough etc..is wajha say ALB costly hota ha but also slow bhi hota ha kyu kay ALB can intercept the HTTP request and decide the load balancing technique and decide which server to forward through the requuest.... so is sarey process may time lagta ha so is wajha say ye slow hotey hain there's a hop/stoppage in between..advance load balancing technique ALB may hoti hain<br></br>
 Network LB works at layer 4 (transport layer) it is very fast, have low latency/delay..Network LB HTTP request ko intercept nhi karta as comapre ko ALB.. ye mostly game server, video streaming servers pay use hota ha..ye request ko ip:port kay through forward kaarta ha..it is at transport layer so it performs routing based on TCP/UDP packets instead of HTTP packets.. NLB can create sticky session.. like i am watching 10 hour long movie on youtube then all my request are going to one specific server<br></br>
 Let suppose i am working in a company jo Virtual applications like VPN or Firewalls pay kaam kartey hain tou is scenario may humey GWLB use karna hota ha kyu kay humey highly secure aur encrypted pacckets server tk ponchaney hotey hain ye kaam GWLB kar sakta ha although ALB aur NLB bhi secure hotey hain but not as much as compare to GWLB <br></br>
+
+# Load Balancer meri apni understanding <br></br>
+load balancer ka asal kaam traffic manage krna hota ha..let suppose aik server ha us pay traffic a rhi ha..ok ha ab wohi traffic increase ho jaye tou us aik server pay both ziada load a jaye ga...is liye hum kia kartey hain multiple servers add kr detay hain tou traffic un multiple servers may divide ho jati ha aur divide karta kon ha? ans is load balancer...load balancer healthy servers dekhta ha aur traffic distribute karta ha.. ye unhealthy servers ko monitor karta ha aur un pay traffic distribute nhi karta... <br></br>
+
+load balancer ki 3 types hain.. ager load balancer ka kaam traffic distribute karnaa hi ha tou 3 types ki zaroorat kyu pari? ans is teen different load balancers.. different type of traffic ko manage kartey hain... <br></br>
+
+Saab say Pehle discuss kartey hain Application Load Balancer....works on layer 7 <br></br>
+
+As name suggests, ye application level ki traffic ko manage karta ha... <br></br>
+
+ye HTTP request ko intercept kr kay headers, qwery string, route wagera dekh leta ha is may 2 tarha ki routing hoti ha host based and path based... abhi let suppose aik ecommerce website ha aur us kay endpoints hain /products,/payments,/customers tou is may path based routing is tarha say hogi.. example.com/products load balancer http/https request ko intercept karey ga aur dekhey ga acha products pay jana ha tou product waley server pay bhej de ga aur host based routing is tarha hoti ha... <br></br>
+
+products.example.com, payments.example.com <br></br>
+ 
+Ab hum discuss kartey hain Network Load Balancer... works on layer 4 <br></br>
+
+ab lazmi nhi ha hamari haar traffic ya haar request HTTP/ HTTPS based ho ya web browser may hi khulti ho.. kuch traffic TCP/UDP/SSH/DNS based bhi hoti hain... let suppose aik company ha un kay aik system ha kay wo temp control kr kay metrices apney db server may daal dein gay yaha pay koi web interface ya Http/https ki zaroorat nhi ha.. simply temp calculate hoga us kay baad TCP ya UDP request db may chali jaye gi... is tarha kay scenario may network load balancer use hota ha like multiple dbs ho gi aur both ziada data hoga jo haar nano second baad a rha hoga.. tou is scenario may network load balancer use hoga.. ab TCP/UDP/SSL/TLS wagera ko samjhatey hain.. <br></br>
+
+TCP hota ha transmission Control Protocol is may three way handshake hota ha ye communication ka reliable source ha.. ye proper data receive honey kay baad acknowledgment bhi bhejta ha..ye databaserelated work kay liye use hota ha.. phir ata ha UPD protocol..ye User Datagram Protocol hota ha.. is may data bs bhej deta ha..receive ho ya na ho none of its concern.. ye live video streaming aur videos games wagera may use hota ha.. ab socho ap WhatsApp pay call kr rhy ho aur packets transfer ho gay phir acknowledgment aye gi phir new packets transfer ho gay.. tou boht laag aye ga call may isi wajha say video streaming ya video call may udp use hota ha jidher acknowledgment ki zaroorat nhi hoti.. <br></br>
+
+phir ata ha TLS aur SSL (SSL ab purana ho gaya ha mostly ab TLS hi use hota ha).. <br></br>
+
+ye basically security kay use hotey hain.. ager HTTP request pay TLS certificate laga kay bheju tou ye HTTPS ban jaye ga... ab ye certificates asal may hotey kia hain.. in ka exact concept confirm nhi pta but jitna pta ha wo explain karta..scene ye hota ha kay request ko encrypt kr kay aik certificate key add kr kay bheja jata ha.. load balancer us certificate key ki value deta ha aur decrypt kr kay server ko bhejta ha ye SSL/TLS termination hota ha.. <br></br>
+
+ 
