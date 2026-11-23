@@ -5148,3 +5148,6 @@ saab say Pehle 2 cheezein samjho <br></br>
 Stateless Flow Stickness and Stateful Flow Stickness.. <br></br>
 Stateless Flow Stickness may hota ye ha kay jb jb new packet aye ga new connect establish hoga aur Stateful Flow Stickness basically connection establish karti ha aur record/track rakhti ha.. letsuppose aik request ayi abc source say aur us nay jana ha xyz destination pay..source ka port ha 123 destination ka port ha 456 aur protocol ha TCP.. tou ab jb Pehle dafa request ayi aik connection establish hua aur request server 1/firewall 1 pay gayi... ab jb jb dobara aisi request aye gi jis ka source abc, destination xyz, sourceip 123, destinationip 456, protocol TCP hoga tb tb GWLB new connection establish nhi karey ga balkey request ko same server1/firewall 1 pay bhej de ga ye flow stickness hota ha GWLB may aur is process ko hum statefil Flowstickness bhi keh saktey hain (not cnfrm).. <br></br>
 stateless flowstickness may hota ye ha kay ye haar packet kay liye new connection bnata ha.. (not cnfrm) <br></br>
+
+# CHATGPT say jo Load Balancer samjha ha us ka link <br></br>
+https://github.com/abdullahjan007/AWS-Load-Balancers-and-types.git
