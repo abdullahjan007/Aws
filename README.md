@@ -5151,3 +5151,19 @@ stateless flowstickness may hota ye ha kay ye haar packet kay liye new connectio
 
 # CHATGPT say jo Load Balancer samjha ha us ka link <br></br>
 https://github.com/abdullahjan007/AWS-Load-Balancers-and-types.git
+
+# Practical Implementation of AWS ALB <br></br>
+aj mainey ABL ki practical implementation ki.. saab say pehle aik VPC create kia with two availability zones...load balancer ko atleast 2 AZ required hotey hain reason is kay ager aaik AZ down ho jaye tou load balancer rrequest dusrey AZ pay bhej de.. aisa nhi ha kay Lb aik AZ may work nhi karta..aik availability zone may multiple servers ho saktey hain aur LB traffic un multiple servers pay distribute kr sakta ha but ager pura AZ hi vich ho gaya tou phir kia hoga is wajha say ye condition manadatory kr di ha kay LB kay liye atleast 2 AZ must ho... <br></br>
+1. First of all we create VPC with 2 AZ have public and private subnet with public IP enable.. <br></br>
+2. phir SG create kiye is VPC may jis may HTTP aur SSH ko allow at port 80 and 22 respectively.. <br></br>
+3. then 2 EC2 instances banaye.. <br></br>
+4. Phir target group create kia..(target group create kartey waqt jo custom VPC select kia tha us may 2 instances show ho rhy thay kyu kay us VPC may total thay hi 2 instances.. phir un instances ko register kia) <br></br>
+LB may 2 important cheezein hoti hain one is Listner and other is target group.. listner is bascially jaha pay load balancer internet say aney wali traffic ko listen kartey ha and target group is basically destination.. like load balancer listner say sun'ney kay baad traffic ko respective target group pay forward karta ha.. <br></br>
+Listener -> Load Balancer -> Target group (not cnfrm) <br></br>
+5. Target group kay baad LB waley section may gaya aur create ALB pay click kia <br></br>
+6. Phir name diya, VPC select kia, SG select kia, dono AZs select kia..  <br></br>
+Target group tou ban gaya tha ab bari ati ha listner/routing ki.. <br></br>
+7. Listner my target group add kia..(for better understanding ui may ja kay dekh lena) <br></br>
+8. phir Manage Rules pay click kr kay Listner ka new rule add kia..(Rule is ager request may app2 ho tou request tg2 ko bhejni ha else tg1 ko bhejni ha.. is tarkeey say dono servers utilize ho gaye..2 alaag listners nhi bnaney parey....like is may path based routing hui kay ager http://baseurl/aapp2 ho tou request server 2/tg2 pay bhejna else request tg1/server 1 pay bhejna) <br></br>
+phir 2 min baad say kuch chalney laag gaya.. <br></br>
+but meray case may aik issue a rha tha 503 bad gateway.. ab bad gateway ka scene ye hota ha kay request jati ha nginx kay through but backend server say response nhi ata backend unreachable hota ha tou it means meray ec2 instances ka issue tha.. pehle mainey sg, tg, instances check kiye saab kuch active and running tha but issue samjh nhi a rha tha.. tou phir ec2 instance ko select kia.. actions kay dropdown may monitoring and scheduling a rha tha us pay gaya udher system logs ya server logs a rha tha us pat click kia tou mujhe logs show honey laag gaye aur issue samjh gaya kay meri index.html wali files hi create nhi hui thi server pay phir wo files manually instances kay ander ja kay create ki.. tou us kaay baad mera issue resolve ho gaya aur mera load balancer sahi work karney laag gaya... <br></br>
